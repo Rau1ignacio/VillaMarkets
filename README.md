@@ -45,12 +45,15 @@ Aplicación web desarrollada en React orientada a la digitalización de minimark
   La comunicación se realiza a través de endpoints RESTful y peticiones HTTP con Axios.
 
 🧪 Scripts disponibles
+
   Comando	Descripción
     npm run dev	Ejecuta el servidor local de desarrollo
     npm run build	Compila la aplicación para producción
     npm run preview	Previsualiza la build localmente
 
 🧠 Integrantes del equipo
+
   Nombre / Rol / Microservicio
+  
     Raúl Bustamante González / Frontend / (Especificar area trabajadas)
     Rodolfo Soto / Frontend / (Especificar area trabajadas)
