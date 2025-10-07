@@ -4,9 +4,8 @@ Aplicación web desarrollada en React orientada a la digitalización de minimark
 
 📘 Descripción del proyecto
 
-  VillaMarkets busca modernizar la gestión de pequeños comercios mediante una plataforma web dinámica que permite a los administradores controlar su inventario, visualizar     ventas y mejorar la experiencia de compra de sus clientes.
-  Este proyecto forma parte de la asignatura Desarrollo FullStack II (FSK2-005) y se centra en la migración del sistema a React para mejorar el rendimiento y la        
-  escalabilidad del front-end.
+  VillaMarkets busca modernizar la gestión de pequeños comercios mediante una plataforma web dinámica que permite a los administradores controlar su inventario, visualizar ventas y mejorar la experiencia de compra de sus clientes.
+  Este proyecto forma parte de la asignatura Desarrollo FullStack II (FSK2-005) y se centra en la migración del sistema a React para mejorar el rendimiento y la escalabilidad del front-end.
 
 🚀 Tecnologías utilizadas
   Categoría	Herramienta
@@ -31,18 +30,6 @@ Aplicación web desarrollada en React orientada a la digitalización de minimark
 
 🧩 Estructura del proyecto
   (Pones estructura una vez terminado)
-
-🌐 Comunicación con microservicios
-
-  VillaMarkets se conecta con los microservicios desplegados en la nube:
-  
-  Gestión de usuarios
-  
-  Gestión de citas
-  
-  Diagnóstico y recetas
-  
-  La comunicación se realiza a través de endpoints RESTful y peticiones HTTP con Axios.
 
 🧪 Scripts disponibles
 
