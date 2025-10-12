@@ -1,46 +1,16 @@
-🛒 VillaMarkets
+# React + Vite
 
-Aplicación web desarrollada en React orientada a la digitalización de minimarkets locales, permitiendo gestionar productos, usuarios y ventas desde una interfaz moderna e intuitiva.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-📘 Descripción del proyecto
+Currently, two official plugins are available:
 
-  VillaMarkets busca modernizar la gestión de pequeños comercios mediante una plataforma web dinámica que permite a los administradores controlar su inventario, visualizar ventas y mejorar la experiencia de compra de sus clientes.
-  Este proyecto forma parte de la asignatura Desarrollo FullStack II (FSK2-005) y se centra en la migración del sistema a React para mejorar el rendimiento y la escalabilidad del front-end.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-🚀 Tecnologías utilizadas
-  Categoría	Herramienta
-  Frontend	React
-  Backend	Node.js, Express
-  Control de versiones	Git, GitHub
-  Otros	HTML5, CSS3, JavaScript (ES6+)
+## React Compiler
 
-⚙️ Instalación y ejecución
-  1. Clonar el repositorio
-  git clone https://github.com/<usuario>/VillaMarkets.git
-  cd VillaMarkets
-  
-  2. Instalar dependencias
-  npm install
-  
-  3. Ejecutar el servidor de desarrollo
-  npm run dev
-  
-  4. Abrir en el navegador
-  http://localhost:5173
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-🧩 Estructura del proyecto
-  (Pones estructura una vez terminado)
+## Expanding the ESLint configuration
 
-🧪 Scripts disponibles
-
-  Comando	Descripción
-    npm run dev	Ejecuta el servidor local de desarrollo
-    npm run build	Compila la aplicación para producción
-    npm run preview	Previsualiza la build localmente
-
-🧠 Integrantes del equipo
-
-  Nombre / Rol / Microservicio
-  
-    Raúl Bustamante González / Frontend / (Especificar area trabajadas)
-    Rodolfo Soto / Frontend / (Especificar area trabajadas)
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
