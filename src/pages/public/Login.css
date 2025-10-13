@@ -1,17 +1,17 @@
 
-
-
-login-container {
-    
+.login-container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f5f5f5;
+    gap: 2rem;
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    padding: 20px;
+    color: #21571e;
 }
 
 .login-card {
-    background: white;
+    background: rgb(237, 238, 237);
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -73,9 +73,259 @@ login-container {
     text-align: center;
     margin-top: 1rem;
 }
-.body {
+
+body {
     font-family: 'Arial', sans-serif;
-    background-color: #0d3b80;
-    margin: 1px;
-    padding: 1px;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    color: #116723;
+}
+
+/* Cuadro de ofertas */
+.ofertas-semana {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    animation: slideInLeft 0.6s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.ofertas-semana h3 {
+    color: #27ae60;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.productos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.producto-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.producto-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.2);
+}
+
+.descuento-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #e74c3c;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.producto-card img {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 0.75rem;
+}
+
+.producto-info {
+    flex: 1;
+}
+
+.producto-info h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.precios {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.precio-original {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.8rem;
+}
+
+.precio-descuento {
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.oferta-texto {
+    text-align: center;
+    margin-top: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .ofertas-semana {
+        max-width: 100%;
+        order: 2;
+    }
+    
+    .login-card {
+        order: 1;
+    }
+}
+/* Credenciales de prueba */
+.credenciales-prueba {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #27ae60;
+}
+/* Título de credenciales */
+.credenciales-prueba h4 {
+    margin: 0 0 0.75rem 0;
+    color: #27ae60;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.credencial-item {
+    font-size: 0.8rem;
+    color: #100202; /* ← Color más oscuro para mejor visibilidad */
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.credencial-item strong {
+    color: #27ae60;
+}
+
+/* Mensaje de error */
+.error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    text-align: center;
+    border: 1px solid #fecaca;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Mejorar inputs */
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd; /* ← Borde más grueso */
+    border-radius: 8px; /* ← Más redondeado */
+    font-size: 1rem;
+    background-color: #fff; /* ← Fondo blanco */
+    color: #333; /* ← Texto oscuro */
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+/* Efecto al enfocar input */
+.form-group input:focus {
+    outline: none;
+    border-color: #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+/* Mejorar placeholder */
+.form-group input::placeholder {
+    color: #1b0808; /* ← Placeholder visible */
+    opacity: 1;
+}
+
+/* Mejorar labels */
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #0a0808; /* ← Color oscuro para labels */
+    font-size: 0.9rem;
+}
+
+/* Mejorar botón */
+.login-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+.login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mejorar footer */
+.login-footer p {
+    color: #150202; /* ← Color más oscuro */
+    font-size: 0.9rem;
+}
+
+.login-footer a {
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Título de iniciar sesión */
+.login-header h2 {
+    color: #333; /* ← Color oscuro para el título */
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
 }

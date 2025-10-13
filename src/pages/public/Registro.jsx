@@ -3,6 +3,7 @@ import './Registro.css';
 
 
 
+// Registro.jsx
 const Registro =() =>{
     const [formData,setFormData] = useState({
         nombre:'',
@@ -11,11 +12,7 @@ const Registro =() =>{
         rut:'',
         telefono:'',
         password:'',
-        
         confirmarPassword:'',
-
-
-        
         terminos: false
     });
 

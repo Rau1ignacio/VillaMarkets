@@ -1,13 +1,14 @@
 
 
 
-.registro-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+.registro-container { /* ← Contenedor principal del registro */
+    min-height: 100vh; /* Ocupa toda la altura de la ventana */
+    display: flex; /* Usamos flexbox para centrar el contenido */
+    align-items: center; /* Centrado vertical */
+    justify-content: center; /* Centrado horizontal */
+    background: linear-gradient(135deg, #159207 0%, #764ba2 100%);/* Gradiente de fondo */
+    padding: 20px; /* Espaciado interno para dispositivos pequeños */
+    font-family: 'Arial', sans-serif; /* Fuente moderna y limpia */
 }
 
 .registro-card {
@@ -150,7 +151,7 @@
 }
 
 .checkbox-label a {
-    color: #667eea;
+    color: #53177d;
     text-decoration: none;
     font-weight: 500;
 }
@@ -162,7 +163,7 @@
 /* Botón de registro */
 .registro-btn {
     padding: 0.875rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #5f1604 0%, #764ba2 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -191,7 +192,7 @@
 }
 
 .registro-footer p {
-    color: #666;
+    color: #620909;
     font-size: 0.9rem;
 }
 
@@ -233,3 +234,15 @@
         width: 60px;
     }
 }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #cdcece;
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+
+}
+
