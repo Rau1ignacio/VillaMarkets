@@ -1,34 +1,22 @@
 import { NavLink } from "react-router-dom";
-
-/**
- * Navbar (versión React del HTML original)
- * Props:
- * - brandName?: string
- * - brandLogo?: string (ruta pública, ej: "/img/Logotipo Villa Markets.jpg")
- * - cartCount?: number
- */
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export default function Navbar({
-
   brandName = "Villa Markets",
   brandLogo = "src/images/Logos/Logotipo Transparente.png",
   cartCount = 0,
 }) {
-
   return (
-    
     <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
       <div className="container">
         <NavLink className="navbar-brand fw-bold d-flex align-items-center gap-2" to="/">
-          {brandLogo && (
-            <img
-              src={brandLogo}
-              alt={brandName}
-              width="40"
-              height="40"
-              className="rounded"
-            />
-          )}
+          <img
+            src={brandLogo}
+            alt={brandName}
+            width="40"
+            height="40"
+            className="rounded"
+          />
           {brandName}
         </NavLink>
 
@@ -45,20 +33,22 @@ export default function Navbar({
         </button>
 
         <div id="nav" className="collapse navbar-collapse">
-          {/* Menú derecho (ms-auto = empuja a la derecha) */}
           <ul id="menu-opciones" className="navbar-nav ms-auto">
             <li className="nav-item">
               <NavLink className="nav-link" to="/">Inicio</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/miniMarkets">Minimarkets</NavLink>
+              <NavLink className="nav-link" to="/minimarkets">Minimarkets</NavLink>
             </li>
             <li className="nav-item">
               <NavLink className="nav-link" to="/productos">Catálogo</NavLink>
             </li>
-
             <li className="nav-item">
-              <NavLink className="nav-link position-relative" to="/carrito" aria-label="Carrito">
+              <NavLink
+                className="nav-link position-relative"
+                to="/carrito"
+                aria-label="Carrito"
+              >
                 <i className="fas fa-shopping-cart" />
                 <span
                   id="cart-count"
@@ -69,7 +59,6 @@ export default function Navbar({
                 </span>
               </NavLink>
             </li>
-
             <li className="nav-item">
               <NavLink className="nav-link" to="/login">Iniciar sesión</NavLink>
             </li>
