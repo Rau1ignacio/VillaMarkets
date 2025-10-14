@@ -1,0 +1,22 @@
+
+
+
+.bg-gradient-primary{
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+
+}
+.hero-section{
+    min-height:80vh;
+    display:flex;
+    align-items:center;
+
+}
+
+/* car*/
+.hover-card{
+    min-height:80vh;
+    display: flex;
+    
+
+
+}
