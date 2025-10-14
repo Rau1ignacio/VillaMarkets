@@ -7,7 +7,7 @@ function seedUsuarios() {
   const store = JSON.parse(localStorage.getItem("usuarios") || "[]");
 
   const base = [
-    { usuario:"admin",    clave:"admin123",   email:"admin@villamarket.com",  rol:"admin"   },
+    { usuario:"admin",    clave:"admin123",   email:"admin@villamarket.com",  rol:"admin"},
     { usuario:"cliente1", clave:"cliente123", email:"cliente1@villamarket.com", rol:"cliente" }
   ];
 
@@ -49,7 +49,7 @@ export default function Login() {
 
       localStorage.setItem("usuarioActual", JSON.stringify(user));
       navigate("/perfil", { replace: true });
-    }, 500); // micro delay para animación
+    }, 500); // micro delay para una animación
   };
 
   return (
@@ -58,7 +58,7 @@ export default function Login() {
         {/* Columna izquierda: tarjeta de login */}
         <section className="login-pretty-card" aria-labelledby="login-title">
           <div className="brand-mini">
-            <img src="src/images/Logos/Logotipo Transparente.png" alt="Villa Markets" width="44" height="44" />
+            <img src="./src/images/Logos/Logotipo Transparente.png" alt="Villa Markets" width="44" height="44" />
             <span>Villa Markets</span>
           </div>
 
