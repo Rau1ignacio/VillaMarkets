@@ -1,185 +1,153 @@
-import React, { useState } from 'react';
-import './Login.css';
-import { useNavigate } from 'react-router-dom';
+// src/pages/Login.jsx
+import { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
+/* Para demo (admin/admin123, cliente1/cliente123) */
+function seedUsuarios() {
+  const store = JSON.parse(localStorage.getItem("usuarios") || "[]");
 
-// Login.jsx
-// 
-const Login = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
+  const base = [
+    { usuario:"admin",    clave:"admin123",   email:"admin@villamarket.com",  rol:"admin"   },
+    { usuario:"cliente1", clave:"cliente123", email:"cliente1@villamarket.com", rol:"cliente" }
+  ];
+
+  const faltan = base.filter(b => !store.some(u => u.usuario === b.usuario));
+  if (store.length === 0 || faltan.length) {
+    localStorage.setItem("usuarios", JSON.stringify([...store, ...faltan]));
+  }
+}
+
+export default function Login() {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => { seedUsuarios(); }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
+
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+    const user = usuarios.find(u => {
+      const matchUser = [u.usuario, u.email, u.correo].includes(username);
+      const matchPass = u.clave === password || u.password === password;
+      return matchUser && matchPass;
     });
 
-    const navigate = useNavigate();
-    const [error, setError] = useState('');
-
-    // Productos en descuento de la semana
-    const productosDescuento = [
-        {
-            id: 1,
-            nombre: "Arroz miraflores chaufan Premium 1kg",
-            precioOriginal: 29.99,
-            precioDescuento: 24.99,
-            descuento: 15,
-            imagen: "/images/productos/arroz-integral-miraflores.webp"
-        },
-        {
-            id: 2,
-            nombre: "Aceite de Oliva 500ml",
-            precioOriginal: 89.99,
-            precioDescuento: 85.99,
-            descuento: 10,
-            imagen: "/images/productos/aceite.jpg"
-        },
-        {
-            id: 3,
-            nombre: "Pan Integral",
-            precioOriginal: 25.00,
-            precioDescuento: 19.00,
-            descuento: 20,
-            imagen: "/images/productos/pan.jpg"
-        }
-    ];
-// datos de usuarios para login simulado
-const usuarios = [
-    {
-        email: 'admin@villamarkets.com',
-        password: 'admin123',
-        role: 'admin',
-        name: 'Administrador'
-    },
-    {
-        email: 'cliente@villamarkets.com',
-        password: 'cliente123',
-        role: 'cliente',
-        name: 'ana lopez'
-    }
-];
-
-// funcionalidades de login aqui
-    function handleInputChange(e) {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        if (error) {
-            setError('');
-        }
-    }
-
-// definir la funcion de submit del formulario
-const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Simular delay de autenticación
     setTimeout(() => {
-        const usuario = usuarios.find(
-            user => user.email === formData.email && user.password === formData.password
-        );
+      setLoading(false);
+      if (!user) { setErrorMsg("Usuario o contraseña incorrectos."); return; }
 
-        if (usuario) {
-            localStorage.setItem('usuario', JSON.stringify(usuario));
-            console.log('Login exitoso:', usuario);
+      if (!user.email && user.correo) user.email = user.correo;
+      if (!user.correo && user.email) user.correo = user.email;
+      if (user.rol === "administrador") user.rol = "admin";
 
-            if (usuario.role === 'admin') {
-                alert(`Bienvenido Admin: ${usuario.name}! Acceso de administrador concedido.`);
-                navigate('/admin/dashboard');
-            } else if (usuario.role === 'cliente') {
-                alert(`Bienvenido Cliente: ${usuario.name}! Acceso de cliente concedido.`);
-                navigate('/cliente/inicio');
-            } else {
-                alert(`Bienvenido Invitado: ${usuario.name}!`);
-            }
-            setError('');
-        } else {
-            setError('Email o contraseña incorrectos');
-        }
-    }, 700);
-};
+      localStorage.setItem("usuarioActual", JSON.stringify(user));
+      navigate("/perfil", { replace: true });
+    }, 500); // micro delay para animación
+  };
 
-// JSX del formulario de login
-return (
-        <div className="login-container">
-            {/* Cuadro de productos en descuento */}
-            <div className="ofertas-semana">
-                <h3>🔥 Ofertas de la Semana</h3>
-                <div className="productos-grid">
-                    {productosDescuento.map(producto => (
-                        <div key={producto.id} className="producto-card">
-                            <div className="descuento-badge">
-                                -{producto.descuento}%
-                            </div>
-                            <img 
-                                src={producto.imagen} 
-                                alt={producto.nombre}
-                                onError={(e) => {
-                                    e.target.src = "/images/producto-placeholder.png";
-                                }}
-                            />
-                            <div className="producto-info">
-                                <h4>{producto.nombre}</h4>
-                                <div className="precios">
-                                    <span className="precio-original">${producto.precioOriginal}</span>
-                                    <span className="precio-descuento">${producto.precioDescuento}</span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                <p className="oferta-texto">¡Regístrate y aprovecha estos descuentos!</p>
+  return (
+    <div className="login-pretty-bg">
+      <main className="login-pretty container-xxl">
+        {/* Columna izquierda: tarjeta de login */}
+        <section className="login-pretty-card" aria-labelledby="login-title">
+          <div className="brand-mini">
+            <img src="src/images/Logos/Logotipo Transparente.png" alt="Villa Markets" width="44" height="44" />
+            <span>Villa Markets</span>
+          </div>
+
+          <h1 id="login-title" className="login-pretty-title">Bienvenido 👋</h1>
+          <p className="login-pretty-sub">Ingresa para continuar comprando en tus minimarkets favoritos.</p>
+
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="input-group-pretty">
+              <i className="fas fa-user" aria-hidden="true" />
+              <input
+                type="text"
+                placeholder="Usuario o correo"
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                aria-label="Usuario o correo"
+              />
             </div>
 
-            {/* Formulario de login */}
-            <div className="login-card">
-                <div className="login-header">
-                    <img src="./src/images/logovilla.jpg" alt="Villa Market" />
-                    <h2>Iniciar Sesión</h2>
-                </div>
-                
-                <form onSubmit={handleSubmit} className="login-form">
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="Ingresa tu email"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="password">Contraseña</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="Ingresa tu contraseña"
-                        />
-                    </div>
-                    
-                    <button type="submit" className="login-btn">
-                        Iniciar Sesión
-                    </button>
-                </form>
-                
-                <div className="login-footer">
-                    <p>¿No tienes cuenta? <a href="/registro">Regístrate</a></p>
-                </div>
+            <div className="input-group-pretty">
+              <i className="fas fa-lock" aria-hidden="true" />
+              <input
+                type={show ? "text" : "password"}
+                placeholder="Contraseña"
+                autoComplete="current-password"
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                aria-label="Contraseña"
+              />
+              <button
+                type="button"
+                className="show-btn"
+                aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
+                onClick={() => setShow(s => !s)}
+              >
+                <i className={`fas ${show ? "fa-eye-slash" : "fa-eye"}`} />
+              </button>
             </div>
-        </div>
 
-    );
-};
+            {errorMsg && <div className="alert-pretty" role="alert">{errorMsg}</div>}
 
+            <button type="submit" className="btn-pretty" disabled={loading}>
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
 
+            <div className="links-row">
+              <span />
+              <NavLink to="/registro" className="link-pretty">Crear cuenta</NavLink>
+            </div>
+          </form>
 
+          <div className="tips-demo">
+            <span className="badge-hint">Demo</span>
+            <span>admin / admin123 · cliente1 / cliente123</span>
+          </div>
+        </section>
 
-export default Login;
+        {/* Columna derecha: panel visual con productos */}
+        <aside className="login-pretty-aside" aria-hidden="true">
+          <div className="aside-overlay">
+            <h2>Novedades de Villa Markets</h2>
+            <div className="chips">
+              <span className="chip">Fresco</span>
+              <span className="chip">Ofertas</span>
+              <span className="chip">Locales</span>
+            </div>
+
+            <div className="cards">
+              {[
+                { img: "src/images/Catalogos/Tiramisú.jpg", name: "Tiramisú", price: "$1.500" },
+                { img: "src/images/Catalogos/ensalada cesar.jpg", name: "Ensalada César", price: "$1.500" },
+                { img: "src/images/Catalogos/Lasaña de carne.jpg", name: "Lasaña de carne", price: "$5.000" },
+                { img: "src/images/Catalogos/Sopa de Tomate.jpg", name: "Sopa de Tomate", price: "$10.000" },
+              ].map((p, i) => (
+                <div className="mini-card" key={i}>
+                  <img src={p.img} alt={p.name} />
+                  <div>
+                    <strong>{p.name}</strong>
+                    <span>{p.price}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+  );
+}

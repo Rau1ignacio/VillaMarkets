@@ -1,15 +1,5 @@
 import { NavLink } from "react-router-dom";
 
-/**
- * Footer (versión React del HTML original)
- * Props:
- * - brandName?: string
- * - tagline?: string
- * - email?: string
- * - phone?: string
- * - year?: number
- */
-
 export default function Footer({
 
   brandName = "Villa Markets",

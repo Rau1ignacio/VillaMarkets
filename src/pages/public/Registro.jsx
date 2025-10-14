@@ -176,9 +176,10 @@ export default function Registro() {
     ) : null;
 
   return (
+
     <div className="container py-5">
      <div className="row justify-content-center">
-      <div className="col-12 col-md-10 col-lg-8 col-xl-7">
+      <div className="col-12 col-md-10 col-lg-8 col-xl-7 mx-auto">
        <div className="form-container">
         <h1 className="text-center text-green mb-4">Crear una cuenta</h1>
         <p className="text-center text-muted mb-4">

@@ -24,10 +24,9 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* No centrar globalmente para permitir que layout use sus propias reglas (Navbar/Footer, min-vh-100, etc.) */
 }
 
 h1 {

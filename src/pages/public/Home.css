@@ -1,2 +1,25 @@
-.display-5 { color: #1f2937; }
-.lead { color: #4b5563; }
+/* Home.css - estilos específicos para la landing/home */.display-5 { color: #1f2937; }
+
+.hero-section{.lead { color: #4b5563; }
+
+  background: linear-gradient(90deg, rgba(40,167,69,0.12), rgba(13,110,253,0.06));
+  padding: 4rem 0;
+}
+.hero-section .display-5{ font-weight:700; }
+.hero-card{ border-radius: .75rem; overflow: hidden; }
+.hero-card .card-body{ padding: 1rem; }
+
+/* ajustar botones al contraste del hero */
+.btn-green{ background: #28a745; color: #fff; }
+.btn-outline-light{ border-color: rgba(255,255,255,0.3); color: #fff; }
+
+/* featured market small polish */
+.market-item h3{ font-size: 1.05rem; margin-bottom: .25rem; }
+.market-item p{ margin-bottom: .75rem; }
+
+/* ensure icons show nicely */
+.fa-2x{ opacity: .95; }
+
+@media (max-width: 576px){
+  .hero-section{ padding: 2.25rem 0; }
+}

@@ -4,7 +4,7 @@ import Footer from "./components/layout/Footer.jsx";
 
 import Home from "./pages/public/Home.jsx";
 // import Carrito from "./pages/public/Carrito.jsx";
-// import Login from "./pages/public/Login.jsx";
+import Login from "./pages/public/Login.jsx";
 import Registro from "./pages/public/Registro.jsx";
 // import MiniMarkets from "./pages/public/MiniMarkets.jsx";
 // import PerfilUsuario from "./pages/public/PerfilUsuario.jsx";
@@ -21,7 +21,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
 
           {/* <Route path="/carrito" element={<Carrito />} /> */}
-          {/* <Route path="/login" element={<Login />} /> */}
+          <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           {/* <Route path="/minimarkets" element={<MiniMarkets />} /> */}
           {/* <Route path="/perfil" element={<PerfilUsuario />} /> */}
