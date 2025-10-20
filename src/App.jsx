@@ -2,17 +2,27 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
 
+
 import Home from "./pages/public/Home.jsx";
 // import Carrito from "./pages/public/Carrito.jsx";
 import Login from "./pages/public/Login.jsx";
 import Registro from "./pages/public/Registro.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import GestionPedidos from "./pages/admin/GestionPedidos.jsx";
+import GestionProductos from "./pages/admin/gestionProductos.jsx";
+
+
+
+import Clienteinicio from "./pages/cliente/Clienteinicio.jsx";
+
+
 // import MiniMarkets from "./pages/public/MiniMarkets.jsx";
 // import PerfilUsuario from "./pages/public/PerfilUsuario.jsx";
 // import ProductosGlobal from "./pages/public/ProductosGlobal.jsx";
 // import Soporte from "./pages/public/Soporte.jsx";
 // import Pedidos from "./pages/public/Pedidos.jsx";
 
-export default function App() {
+function App() {
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
       <Navbar />
@@ -23,6 +33,12 @@ export default function App() {
           {/* <Route path="/carrito" element={<Carrito />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/gestionpedidos" element={<GestionPedidos />} />
+          <Route path="/admin/gestion-pedidos" element={<GestionPedidos />} />
+          <Route path="/admin/gestion-productos" element={<GestionProductos />} />
+          
+          <Route path="/clienteinicio" element={<Clienteinicio />} />
           {/* <Route path="/minimarkets" element={<MiniMarkets />} /> */}
           {/* <Route path="/perfil" element={<PerfilUsuario />} /> */}
           {/* <Route path="/productos" element={<ProductosGlobal />} /> */}
@@ -35,4 +51,6 @@ export default function App() {
       <Footer />
     </div>
   );
+
 }
+export default App;

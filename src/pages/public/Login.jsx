@@ -41,24 +41,43 @@ export default function Login() {
 
     setTimeout(() => {
       setLoading(false);
-      if (!user) { setErrorMsg("Usuario o contraseña incorrectos."); return; }
+      if (!user) { 
+        setErrorMsg("Usuario o contraseña incorrectos."); 
+        return; 
+      }
 
+      // Normalizar datos del usuario
       if (!user.email && user.correo) user.email = user.correo;
       if (!user.correo && user.email) user.correo = user.email;
       if (user.rol === "administrador") user.rol = "admin";
 
+      // Guardar usuario actual en localStorage
       localStorage.setItem("usuarioActual", JSON.stringify(user));
-      navigate("/perfil", { replace: true });
+
+      // Debug: mostrar información del usuario
+      console.log("Usuario logueado:", user);
+      console.log("Rol del usuario:", user.rol);
+
+      // Redireccionar según el rol del usuario
+      if (user.rol === "admin") {
+        console.log("Redirigiendo a /admin");
+        navigate("/admin", { replace: true });
+      } else if (user.rol === "cliente") {
+        console.log("Redirigiendo a /clienteinicio");
+        navigate("/clienteinicio", { replace: true });
+      } else {
+        console.log("Rol no reconocido, redirigiendo a /clienteinicio por defecto");
+        navigate("/clienteinicio", { replace: true });
+      }
     }, 500); // micro delay para animación
   };
-
   return (
     <div className="login-pretty-bg">
       <main className="login-pretty container-xxl">
         {/* Columna izquierda: tarjeta de login */}
         <section className="login-pretty-card" aria-labelledby="login-title">
           <div className="brand-mini">
-            <img src="src/images/Logos/Logotipo Transparente.png" alt="Villa Markets" width="44" height="44" />
+            <img src="./src/images/Logos/Logotipo Transparente.png" alt="Villa Markets" width="44" height="44" />
             <span>Villa Markets</span>
           </div>
 
@@ -115,7 +134,7 @@ export default function Login() {
 
           <div className="tips-demo">
             <span className="badge-hint">Demo</span>
-            <span>admin / admin123 · cliente1 / cliente123</span>
+            <span>admin / admin123 (→ Admin Dashboard) · cliente1 / cliente123 (→ Cliente Inicio)</span>
           </div>
         </section>
 
@@ -150,4 +169,5 @@ export default function Login() {
       </main>
     </div>
   );
+
 }

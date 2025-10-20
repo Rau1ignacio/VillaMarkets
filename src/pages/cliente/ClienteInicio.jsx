@@ -13,7 +13,7 @@ const ClienteInicio = () => {
             <header className="cliente-header">
                 <div className="cliente-nav">
                     <img src="/images/logovilla.jpg" alt="Villa Market" className="logo" />
-                    <h1>Villa Markets</h1>
+                    <h1>Villa Markets  cliente1 </h1>
                     <div className="nav-actions">
                         <button className="cart-btn">🛒 Carrito (0)</button>
                         <button onClick={handleLogout} className="logout-btn">Cerrar Sesión</button>
