@@ -7,6 +7,7 @@ const GestionProductos = () => {
     const [productos, setProductos] = useState([]); // Lista de productos
     const [editingIdx, setEditingIdx] = useState(-1); // Índice del producto en edición
     const [form, setForm] = useState({ nombre: '', precio: 0, stock: 0 });
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
 
@@ -43,7 +44,7 @@ const GestionProductos = () => {
         if (!window.confirm('Eliminar producto?')) return;
         setProductos((p) => p.filter((prod) => prod.id !== id));
     };
-
+    // función para iniciar la edición de un producto
     const handleEdit = (idx) => {
         setEditingIdx(idx);
         setForm(productos[idx]);
@@ -56,19 +57,21 @@ const GestionProductos = () => {
     
     // ¿Estamos editando un producto?
     const editing = editingIdx !== -1;
-
     const startCreate = () => {
         setEditingIdx(-1);
         setForm({ nombre: '', precio: 0, stock: 0 });
+        setShowModal(true);
     };
 
+    // función para iniciar la edición desde la lista
     const startEdit = (p) => {
         const idx = productos.findIndex(x => x.id === p.id);
         if (idx !== -1) {
             handleEdit(idx);
+            setShowModal(true);
         }
     };
-
+    // 
     const handleSubmit = (e) => {
         if (editing) {
             handleUpdate(e);
@@ -95,19 +98,8 @@ const GestionProductos = () => {
           <button className="btn btn-outline-info" onClick={async () => { await syncWithServer(); alert('Sync ejecutado'); }}>Sincronizar</button>
         </div>
       </div>
-            {/* formulario de agregar/editar producto */}
+
       <div className="row">
-        <div className="col-md-4">
-          <div className="card p-3 mb-3">
-            <h5>{editing ? 'Editar producto' : 'Agregar producto'}</h5>
-            <form onSubmit={handleSubmit}>
-              <input name="nombre" className="form-control mb-2" placeholder="Nombre" value={form.nombre} onChange={handleChange} required />
-              <input name="precio" className="form-control mb-2" type="number" placeholder="Precio" value={form.precio} onChange={handleChange} min="0" required />
-              <input name="stock" className="form-control mb-2" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} min="0" required />
-              <button className="btn btn-primary w-100" type="submit">{editing ? 'Guardar' : 'Agregar'}</button>
-            </form>
-          </div>
-        </div>
 
         <div className="col-md-8">
           <div className="list-group">
@@ -124,10 +116,63 @@ const GestionProductos = () => {
             ))}
             {productos.length === 0 && <div className="text-muted p-3">No hay productos.</div>}
           </div>
+  {/* Modal: menú detallado para agregar/editar/eliminar */}
+  {showModal && (
+    <div className="modal show d-block" tabIndex="-1" role="dialog" onClick={() => setShowModal(false)}>
+      <div className="modal-dialog modal-lg" role="document" onClick={e => e.stopPropagation()}>
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">{editing ? 'Editar producto' : 'Nuevo producto'}</h5>
+            <button type="button" className="btn-close" aria-label="Close" onClick={() => setShowModal(false)}></button>
+          </div>
+          <div className="modal-body">
+            <div className="row">
+              <div className="col-md-6">
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-2">
+                    <input name="nombre" className="form-control" placeholder="Nombre" value={form.nombre} onChange={handleChange} required />
+                  </div>
+                  <div className="mb-2">
+                    <input name="precio" className="form-control" type="number" placeholder="Precio" value={form.precio} onChange={handleChange} min="0" required />
+                  </div>
+                  <div className="mb-2">
+                    <input name="stock" className="form-control" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} min="0" required />
+                  </div>
+                  <div className="d-flex gap-2">
+                    <button className="btn btn-primary" type="submit">{editing ? 'Guardar' : 'Agregar'}</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => { setForm({ nombre: '', precio: 0, stock: 0 }); setEditingIdx(-1); }}>Limpiar</button>
+                  </div>
+                </form>
+              </div>
+              <div className="col-md-6">
+                <h6>Lista (editar rápido)</h6>
+                <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                  {productos.map((pp, i) => (
+                    <div key={pp.id} className="d-flex justify-content-between align-items-center mb-2">
+                      <div>
+                        <strong>{pp.nombre}</strong><div className="text-muted small">S/ {pp.precio} • {pp.stock}</div>
+                      </div>
+                      <div>
+                        <button className="btn btn-sm btn-outline-secondary me-1" onClick={() => { handleEdit(i); }}>Editar</button>
+                        <button className="btn btn-sm btn-danger" onClick={() => { if (window.confirm('Eliminar producto?')) handleDelete(pp.id); }}>Eliminar</button>
+                      </div>
+                    </div>
+                  ))}
+                  {productos.length === 0 && <div className="text-muted">No hay productos.</div>}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cerrar</button>
+          </div>
         </div>
       </div>
     </div>
-  );
+  )}
+    </div>
+      </div>
+    </div>
+  );  
 };
-
 export default GestionProductos;

@@ -10,7 +10,10 @@ import Registro from "./pages/public/Registro.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import GestionPedidos from "./pages/admin/GestionPedidos.jsx";
 import GestionProductos from "./pages/admin/gestionProductos.jsx";
-
+import GestionUsuarios from "./pages/admin/Gestionusuarios.jsx";
+import Reportes from "./pages/admin/reportes.jsx";
+import Configuracion from "./pages/admin/Configuracion.jsx";
+import Tiendas from "./pages/admin/Tiendas.jsx";
 
 
 import Clienteinicio from "./pages/cliente/Clienteinicio.jsx";
@@ -37,6 +40,10 @@ function App() {
           <Route path="/gestionpedidos" element={<GestionPedidos />} />
           <Route path="/admin/gestion-pedidos" element={<GestionPedidos />} />
           <Route path="/admin/gestion-productos" element={<GestionProductos />} />
+          <Route path="/admin/gestion-usuarios" element={<GestionUsuarios />} />
+          <Route path="/admin/reportes" element={<Reportes />} />
+          <Route path="/admin/configuracion" element={<Configuracion />} />
+          <Route path="/admin/tiendas" element={<Tiendas />} />
           
           <Route path="/clienteinicio" element={<Clienteinicio />} />
           {/* <Route path="/minimarkets" element={<MiniMarkets />} /> */}

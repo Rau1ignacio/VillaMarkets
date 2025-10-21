@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-
+    // Función para cerrar sesión
     const handleLogout = () => {
         localStorage.removeItem('usuario');
         window.location.href = '/login';
@@ -19,8 +19,25 @@ const AdminDashboard = () => {
         navigate('/admin/gestion-productos');
     };
 
+    // Función para navegar a Gestión de Usuarios
+    const handleGestionUsuarios = () => {
+        navigate('/admin/gestion-usuarios');
+    };
+    // Función para navegar a Tiendas
+    const handleGestionTiendas = () => {
+        navigate('/admin/tiendas');
+    };
+    // Función para navegar a Configuración
+    const handleConfiguracion = () => {
+        navigate('/admin/configuracion');
+    };
+    // función para navegar a Reportes
+    const handleReportes = () => {
+        navigate('/admin/reportes');
+    }
 
 
+// Estructura del componente
     return (
         <div className="admin-dashboard">
             {/* Header responsivo con Bootstrap */}
@@ -31,7 +48,7 @@ const AdminDashboard = () => {
                             {/* Logo */}
                             <a className="navbar-brand d-flex align-items-center" href="">
                                 <img 
-                                    src="./images/Logos/Logotipo Transparente.png" 
+                                    src="./src/images/Logos/Logotipo Transparente.png" 
                                     alt="Villa Market" 
                                     className="logo me-3"
                                     width="50" 
@@ -57,6 +74,7 @@ const AdminDashboard = () => {
                             {/* Menú colapsable */}
                             <div className="collapse navbar-collapse" id="navbarNav">
                                 <div className="navbar-nav ms-auto">
+                                    
                                     <span className="navbar-text me-3 d-none d-lg-inline">
                                         <i className="fas fa-user-shield me-2"></i>
                                         Administrador
@@ -84,7 +102,7 @@ const AdminDashboard = () => {
                             <div className="welcome-card p-4 bg-gradient-primary text-white rounded-3 shadow">
                                 <h2 className="h3 mb-2">
                                     <i className="fas fa-tachometer-alt me-2"></i>
-                                    Dashboard Administrativo
+                                    Administrativo
                                 </h2>
                                 <p className="mb-0 opacity-75">
                                     Gestiona tu plataforma desde un solo lugar
@@ -106,7 +124,10 @@ const AdminDashboard = () => {
                                     <p className="card-text text-muted">
                                         Administrar clientes y vendedores
                                     </p>
-                                    <button className="btn btn-info btn-sm w-100">
+                                    <button 
+                                        onClick={handleGestionUsuarios}
+                                        className="btn btn-info btn-sm w-100"
+                                    >
                                         <i className="fas fa-eye me-2"></i>
                                         Ver Usuarios
                                     </button>
@@ -169,7 +190,10 @@ const AdminDashboard = () => {
                                     <p className="card-text text-muted">
                                         Análisis y estadísticas
                                     </p>
-                                    <button className="btn btn-primary btn-sm w-100">
+                                    <button 
+                                        onClick={handleReportes}
+                                        className="btn btn-primary btn-sm w-100"
+                                    >
                                         <i className="fas fa-eye me-2"></i>
                                         Ver Reportes
                                     </button>
@@ -188,7 +212,10 @@ const AdminDashboard = () => {
                                     <p className="card-text text-muted">
                                         Gestionar minimarkets
                                     </p>
-                                    <button className="btn btn-secondary btn-sm w-100">
+                                    <button 
+                                        onClick={handleGestionTiendas}
+                                        className="btn btn-secondary btn-sm w-100"
+                                    >
                                         <i className="fas fa-eye me-2"></i>
                                         Ver Tiendas
                                     </button>
@@ -207,7 +234,10 @@ const AdminDashboard = () => {
                                     <p className="card-text text-muted">
                                         Ajustes del sistema
                                     </p>
-                                    <button className="btn btn-dark btn-sm w-100">
+                                    <button 
+                                        onClick={handleConfiguracion}
+                                        className="btn btn-dark btn-sm w-100"
+                                    >
                                         <i className="fas fa-cog me-2"></i>
                                         Configurar
                                     </button>
