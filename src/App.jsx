@@ -9,14 +9,21 @@ import Login from "./pages/public/Login.jsx";
 import Registro from "./pages/public/Registro.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import GestionPedidos from "./pages/admin/GestionPedidos.jsx";
-import GestionProductos from "./pages/admin/gestionProductos.jsx";
-import GestionUsuarios from "./pages/admin/Gestionusuarios.jsx";
-import Reportes from "./pages/admin/reportes.jsx";
+import GestionProductos from "./pages/admin/GestionProductos.jsx";
+import GestionUsuarios from "./pages/admin/GestionUsuarios.jsx";
+import Reportes from "./pages/admin/Reportes.jsx";
 import Configuracion from "./pages/admin/Configuracion.jsx";
 import Tiendas from "./pages/admin/Tiendas.jsx";
 
 
 import Clienteinicio from "./pages/cliente/Clienteinicio.jsx";
+import Minimarket from "./pages/cliente/Minimarket.jsx";
+import Perfil from "./pages/cliente/Perfil.jsx";
+import Ofertas from "./pages/cliente/ofertas.jsx";
+import MisPedidos from "./pages/cliente/MisPedidos.jsx";
+import Carrito from "./pages/cliente/MiCarrito.jsx";
+import Producto from "./pages/cliente/Producto.jsx";
+
 
 
 // import MiniMarkets from "./pages/public/MiniMarkets.jsx";
@@ -46,7 +53,12 @@ function App() {
           <Route path="/admin/tiendas" element={<Tiendas />} />
           
           <Route path="/clienteinicio" element={<Clienteinicio />} />
-          {/* <Route path="/minimarkets" element={<MiniMarkets />} /> */}
+          <Route path="/clienteinicio/minimarket" element={<Minimarket />} />
+          <Route path="/clienteinicio/perfil" element={<Perfil />} />
+          <Route path="/clienteinicio/ofertas" element={<Ofertas />} />
+          <Route path="/clienteinicio/mis-pedidos" element={<MisPedidos />} />
+          <Route path="/clienteinicio/micarrito" element={<Carrito />} />
+          <Route path="/clienteinicio/producto" element={<Producto />} />
           {/* <Route path="/perfil" element={<PerfilUsuario />} /> */}
           {/* <Route path="/productos" element={<ProductosGlobal />} /> */}
           {/* <Route path="/soporte" element={<Soporte />} /> */}

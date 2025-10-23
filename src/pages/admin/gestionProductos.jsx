@@ -6,48 +6,97 @@ import React, { useState, useEffect } from 'react';
 const GestionProductos = () => {
     const [productos, setProductos] = useState([]); // Lista de productos
     const [editingIdx, setEditingIdx] = useState(-1); // Índice del producto en edición
-    const [form, setForm] = useState({ nombre: '', precio: 0, stock: 0 });
+  const [form, setForm] = useState({
+    nombre: '',
+    precio: 0,
+    imagen: '',
+    descripcion: '',
+    categoria: '',
+    stock: 0,
+    minimarket: ''
+  });
     const [showModal, setShowModal] = useState(false);
 
-    useEffect(() => {
-
-        setProductos([
-            { id:1,nombre:'Producto a', precio:100,stock:10},
-            { id:2,nombre:'Producto b',precio:200, stock:20},
-        ]);
-    },[]);
+  useEffect(() => {
+    const productosGuardados = JSON.parse(localStorage.getItem('productos'));
+    if (productosGuardados && productosGuardados.length > 0) {
+      setProductos(productosGuardados);
+    } else {
+      setProductos([
+        { id:1,nombre:'Producto a', precio:100,stock:10},
+        { id:2,nombre:'Producto b',precio:200, stock:20},
+      ]);
+      localStorage.setItem('productos', JSON.stringify([
+        { id:1,nombre:'Producto a', precio:100,stock:10},
+        { id:2,nombre:'Producto b',precio:200, stock:20},
+      ]));
+    }
+  },[]);
 
     // Función para manejar cambios en el formulario
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm((s) => ({ ...s, [name]: name === 'nombre' ? value : Number(value) }));
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((s) => ({
+      ...s,
+      [name]: name === 'precio' || name === 'stock' ? Number(value) : value
+    }));
+  };
     // Función para agregar un nuevo producto
 
-    const handleCreate = (e) => {
-        e.preventDefault();
-        const nuevo = { id: Date.now(), ...form };
-        setProductos((p) => [nuevo, ...p]);
-        setForm({ nombre: '', precio: 0, stock: 0 });
-    };
+  const handleCreate = (e) => {
+    e.preventDefault();
+    const nuevo = { id: Date.now(), ...form };
+    const nuevosProductos = [nuevo, ...productos];
+    setProductos(nuevosProductos);
+    localStorage.setItem('productos', JSON.stringify(nuevosProductos));
+    setForm({
+      nombre: '',
+      precio: 0,
+      imagen: '',
+      descripcion: '',
+      categoria: '',
+      stock: 0,
+      minimarket: ''
+    });
+  };
 
     // función para actualizar un producto existente
-    const handleUpdate = (e) => {
-        e.preventDefault();
-        setProductos((p) => p.map((item, i) => (i === editingIdx ? { ...item, ...form } : item)));
-        setEditingIdx(-1);
-        setForm({ nombre: '', precio: 0, stock: 0 });
-    };
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    const nuevosProductos = productos.map((item, i) => (i === editingIdx ? { ...item, ...form } : item));
+    setProductos(nuevosProductos);
+    localStorage.setItem('productos', JSON.stringify(nuevosProductos));
+    setEditingIdx(-1);
+    setForm({
+      nombre: '',
+      precio: 0,
+      imagen: '',
+      descripcion: '',
+      categoria: '',
+      stock: 0,
+      minimarket: ''
+    });
+  };
 
     // función para eliminar un producto
-    const handleDelete = (id) => {
-        if (!window.confirm('Eliminar producto?')) return;
-        setProductos((p) => p.filter((prod) => prod.id !== id));
-    };
+  const handleDelete = (id) => {
+    if (!window.confirm('Eliminar producto?')) return;
+    const nuevosProductos = productos.filter((prod) => prod.id !== id);
+    setProductos(nuevosProductos);
+    localStorage.setItem('productos', JSON.stringify(nuevosProductos));
+  };
     // función para iniciar la edición de un producto
     const handleEdit = (idx) => {
         setEditingIdx(idx);
-        setForm(productos[idx]);
+    setForm({
+      nombre: productos[idx].nombre || '',
+      precio: productos[idx].precio || 0,
+      imagen: productos[idx].imagen || '',
+      descripcion: productos[idx].descripcion || '',
+      categoria: productos[idx].categoria || '',
+      stock: productos[idx].stock || 0,
+      minimarket: productos[idx].minimarket || ''
+    });
     };
 
 
@@ -130,13 +179,46 @@ const GestionProductos = () => {
               <div className="col-md-6">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-2">
+                    <label className="form-label">Nombre</label>
                     <input name="nombre" className="form-control" placeholder="Nombre" value={form.nombre} onChange={handleChange} required />
                   </div>
                   <div className="mb-2">
+                    <label className="form-label">Precio</label>
                     <input name="precio" className="form-control" type="number" placeholder="Precio" value={form.precio} onChange={handleChange} min="0" required />
                   </div>
                   <div className="mb-2">
+                    <label className="form-label">Imagen (nombre de archivo)</label>
+                    <input name="imagen" className="form-control" placeholder="Ej: arroz.jpg" value={form.imagen} onChange={handleChange} />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Descripción</label>
+                    <textarea name="descripcion" className="form-control" placeholder="Descripción" value={form.descripcion} onChange={handleChange} rows={2} />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Categoría</label>
+                    <select name="categoria" className="form-select" value={form.categoria} onChange={handleChange} required>
+                      <option value="">Selecciona una categoría</option>
+                      <option value="abarrotes">Abarrotes</option>
+                      <option value="lacteos">Lácteos</option>
+                      <option value="frutas">Frutas y Verduras</option>
+                      <option value="limpieza">Limpieza</option>
+                      <option value="bebidas">Bebidas</option>
+                      <option value="panaderia">Panadería</option>
+                    </select>
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Stock</label>
                     <input name="stock" className="form-control" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} min="0" required />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Minimarket</label>
+                    <select name="minimarket" className="form-select" value={form.minimarket} onChange={handleChange} required>
+                      <option value="">Selecciona un minimarket</option>
+                      <option value="Villa Central">Villa Central</option>
+                      <option value="Villa Norte">Villa Norte</option>
+                      <option value="Villa Este">Villa Este</option>
+                      <option value="Villa Sur">Villa Sur</option>
+                    </select>
                   </div>
                   <div className="d-flex gap-2">
                     <button className="btn btn-primary" type="submit">{editing ? 'Guardar' : 'Agregar'}</button>
