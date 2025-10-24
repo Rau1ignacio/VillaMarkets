@@ -86,7 +86,7 @@ export default function Home() {
           <div className="col-12 col-lg-6 text-center">
             <div className="position-relative d-inline-block">
               <img
-                src="./src/images/Logos/Logotipo Transparente.png"
+                src="/img/hero-groceries.png"
                 onError={(e)=>{e.currentTarget.style.display='none';}}
                 alt="Compra en tu barrio"
                 className="hero-illustration rounded-4 shadow-lg"

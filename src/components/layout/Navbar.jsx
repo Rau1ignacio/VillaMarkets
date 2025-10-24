@@ -3,7 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export default function Navbar({
   brandName = "Villa Markets",
-  brandLogo = "src/images/Logos/Logotipo Transparente.png",
+  brandLogo = "./src/images/Logos/Logotipo Transparente.png",
   cartCount = 0,
 }) {
   return (
