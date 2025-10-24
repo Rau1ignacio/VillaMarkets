@@ -18,9 +18,10 @@ function seedUsuarios() {
   }
 }
 
+// Componente Login
 export default function Login() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [username, setUsername,] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -64,12 +65,14 @@ export default function Login() {
       if (user.rol === "admin") {
         console.log("Redirigiendo a /admin");
         navigate("/admin", { replace: true });
+
       } else if (user.rol === "cliente") {
-        console.log("Redirigiendo a /clienteinicio");
-        navigate("/clienteinicio", { replace: true });
+        console.log("Redirigiendo a /perfil");
+        navigate("/perfil", { replace: true });
+        
       } else {
-        console.log("Rol no reconocido, redirigiendo a /clienteinicio por defecto");
-        navigate("/clienteinicio", { replace: true });
+        console.log("Rol no reconocido, redirigiendo a /Home por defecto");
+        navigate("/Home", { replace: true });
       }
     }, 500); // micro delay para animación
   };
@@ -94,12 +97,12 @@ export default function Login() {
               <i className="fas fa-user" aria-hidden="true" />
               <input
                 type="text"
-                placeholder="Usuario o correo"
+                placeholder="Usuario o Email"
                 autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                aria-label="Usuario o correo"
+                aria-label="Usuario o Email"
               />
             </div>
 
@@ -115,6 +118,7 @@ export default function Login() {
                 required
                 aria-label="Contraseña"
               />
+              {/* Boton para mostrar o ocultar contraseña */}
               <button
                 type="button"
                 className="show-btn"
@@ -127,6 +131,7 @@ export default function Login() {
 
             {errorMsg && <div className="alert-pretty" role="alert">{errorMsg}</div>}
 
+            {/*Boton de entrar*/}
             <button type="submit" className="btn-pretty" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
             </button>

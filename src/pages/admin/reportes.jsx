@@ -69,6 +69,7 @@ export default function Reportes() {
 
   const labels = ['Lun','Mar','Mie','Jue','Vie','Sab','Dom']
 
+  // HTML ---------------------------------------------------------------------------------------
   return (
     <div style={{padding: 20, maxWidth: 900, margin: '0 auto'}}>
       <h2>Reportes - Ventas semanales</h2>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './GestionPedidos.css';
+import '../../styles/GestionPedidos.css';
 import Logo from "../../images/Logos/Logotipo Transparente.png"
 
 
@@ -44,7 +44,7 @@ const GestionPedidos = () => {
                 fecha: '2025-10-15',
                 hora: '14:30',
                 estado: 'pendiente',
-                total: 4550,
+                totalVentas: "CLP 15,420",
                 tienda: 'Minimarket Central',
                 direccion: 'Av. Principal 123',
                 productos: [
@@ -295,7 +295,7 @@ const GestionPedidos = () => {
                                                             {pedido.estado}
                                                         </span>
                                                     </td>
-                                                    <td className="fw-bold text-success">S/ {pedido.total.toFixed(2)}</td>
+                                                    <td className="fw-bold text-success">CLP {pedido.total.toFixed(0)}</td>
                                                     <td>
                                                         <div className="btn-group" role="group">
                                                             <button
@@ -373,7 +373,7 @@ const GestionPedidos = () => {
                                             <p><strong>Fecha:</strong> {selectedPedido?.fecha}</p>
                                             <p><strong>Hora:</strong> {selectedPedido?.hora}</p>
                                             <p><strong>Tienda:</strong> {selectedPedido?.tienda}</p>
-                                            <p><strong>Total:</strong> S/ {selectedPedido?.total.toFixed(2)}</p>
+                                            <p><strong>Total:</strong> CLP ${selectedPedido?.total.toFixed(0)}</p>
                                         </div>
                                         <div className="col-12">
                                             <h6 className="fw-bold">Productos</h6>
@@ -391,7 +391,7 @@ const GestionPedidos = () => {
                                                             <tr key={index}>
                                                                 <td>{producto.nombre}</td>
                                                                 <td>{producto.cantidad}</td>
-                                                                <td>S/ {producto.precio.toFixed(2)}</td>
+                                                                <td>CLP ${producto.precio.toFixed(2)}</td>
                                                             </tr>
                                                         ))}
                                                     </tbody>
@@ -569,7 +569,7 @@ const GestionPedidos = () => {
                                                             <tr key={index}>
                                                                 <td>{producto.nombre}</td>
                                                                 <td>{producto.cantidad}</td>
-                                                                <td>S/ {producto.precio.toFixed(2)}</td>
+                                                                <td>CLP {producto.precio.toFixed(0)}</td>
                                                                 <td>
                                                                     <button
                                                                         type="button"
@@ -582,11 +582,11 @@ const GestionPedidos = () => {
                                                             </tr>
                                                         ))}
                                                     </tbody>
-                                                    <tfoot>
+                                                            <tfoot>
                                                         <tr className="table-light">
                                                             <th colSpan="2">Total</th>
                                                             <th colSpan="2">
-                                                                S/ {formData.productos.reduce((sum, prod) => sum + prod.precio, 0).toFixed(2)}
+                                                                CLP {formData.productos.reduce((sum, prod) => sum + prod.precio, 0).toFixed(0)}
                                                             </th>
                                                         </tr>
                                                     </tfoot>

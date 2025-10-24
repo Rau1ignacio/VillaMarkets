@@ -168,16 +168,12 @@ export default function PerfilUsuario() {
               </p>
               <hr />
               <div className="text-start">
+                {/* Email en perfil */}
                 <p>
                   <i className="fas fa-envelope me-2" />
                   <span id="perfil-email">{usuario?.email ?? "—"}</span>
                 </p>
-                <p>
-                  <i className="fas fa-calendar-alt me-2" />
-                  <span id="perfil-fecha">
-                    Miembro desde: {usuario?.miembroDesde ?? "—"}
-                  </span>
-                </p>
+
               </div>
               <button onClick={cerrarSesion} className="btn btn-outline-danger mt-2 w-100">
                 <i className="fas fa-sign-out-alt me-2" /> Cerrar sesión

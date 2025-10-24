@@ -4,10 +4,7 @@ import logo from "../../images/Logos/Logotipo Transparente.png"; // dinamioca im
 
 export default function Navbar({
   brandName = "Villa Markets",
-<<<<<<< HEAD
   brandLogo = "./src/images/Logos/Logotipo Transparente.png",
-=======
->>>>>>> 6983468eb2663d2cb6ea79f196016128f8ea0959
   cartCount = 0,
 }) {
   return (
@@ -42,7 +39,7 @@ export default function Navbar({
               <NavLink className="nav-link" to="/">Inicio</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/minimarkets">Minimarkets</NavLink>
+              <NavLink className="nav-link" to="/minimarket">Minimarkets</NavLink>
             </li>
             <li className="nav-item">
               <NavLink className="nav-link" to="/productos">Catálogo</NavLink>

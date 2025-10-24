@@ -102,7 +102,7 @@ body {
 /* Modo oscuro */
 @media (prefers-color-scheme: dark) {
     .admin-dashboard {
-        background: linear-gradient(135deg, #369827 0%, #34495e 100%);
+        background: linear-gradient(135deg, #fdfffd 0%, #aacff3 100%);
     }
     
     .admin-header {

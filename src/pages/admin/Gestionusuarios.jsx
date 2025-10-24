@@ -1,15 +1,14 @@
-// ...existing code...
 import React, { useEffect, useState } from 'react';
-
 
 // Datos de ejemplo para usuarios de prueba
 const initialUsuarios = [
     { id: 1, nombre: 'Juan Perez', email: 'juan@mail.com', telefono: '555-1111', tipo_usuario: 'vendedor', estado: 'activo', fecha_registro: new Date().toISOString(), local_nombre: 'Tienda Centro' },
     { id: 2, nombre: 'María Gómez', email: 'maria@mail.com', telefono: '555-2222', tipo_usuario: 'cliente', estado: 'activo', fecha_registro: new Date().toISOString(), local_nombre: null },
 ];
+
 // Componente principal de gestión de usuarios
 const GestionUsuarios = () => {
-    const [usuarios, setUsuarios] = useState([]); // Estado para almacenar la lista de usuarios
+    const [usuarios, setUsuarios] = useState([]);
     const [tiendas, setTiendas] = useState([]);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
@@ -112,119 +111,267 @@ const GestionUsuarios = () => {
     };
 
     return (
-        <div style={{ padding: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <h2>Gestión de Usuarios</h2>
-                <button onClick={abrirNuevo}>+ Nuevo Usuario</button>
-            </div>
-
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                <div>
-                    <button onClick={() => setFiltroTipo('todos')} className={filtroTipo === 'todos' ? 'active' : ''}>Todos ({usuarios.length})</button>
-                    <button onClick={() => setFiltroTipo('cliente')} className={filtroTipo === 'cliente' ? 'active' : ''}>Clientes ({usuarios.filter(u => u.tipo_usuario === 'cliente').length})</button>
-                    <button onClick={() => setFiltroTipo('vendedor')} className={filtroTipo === 'vendedor' ? 'active' : ''}>Vendedores ({usuarios.filter(u => u.tipo_usuario === 'vendedor').length})</button>
-                    <button onClick={() => setFiltroTipo('admin')} className={filtroTipo === 'admin' ? 'active' : ''}>Admins ({usuarios.filter(u => u.tipo_usuario === 'admin').length})</button>
+        <div className="container py-4">
+            {/* Encabezado */}
+            <div className="bg-white rounded-3 shadow-sm p-4 mb-4">
+                <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 className="mb-1">
+                            <i className="fas fa-users me-2 text-primary"></i>
+                            Gestión de Usuarios
+                        </h2>
+                        <p className="text-muted mb-0">Administra los usuarios registrados en la plataforma</p>
+                    </div>
+                    <button className="btn btn-primary" onClick={abrirNuevo}>
+                        <i className="fas fa-user-plus me-2"></i>
+                        Nuevo Usuario
+                    </button>
                 </div>
-                <input
-                    type="text"
-                    placeholder="buscar por nombre o email"
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
-                    style={{ flex: 1 }}
-                />
             </div>
 
-            <div className="tabla-usuarios" style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Teléfono</th>
-                            <th>Tipo</th>
-                            <th>Local</th>
-                            <th>Estado</th>
-                            <th>Registro</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {usuariosFiltrados.length === 0 ? (
+            {/* Filtros y búsqueda */}
+            <div className="bg-white rounded-3 shadow-sm p-4 mb-4">
+                <div className="row g-3 align-items-center">
+                    <div className="col-md-8">
+                        <div className="btn-group" role="group">
+                            <button 
+                                onClick={() => setFiltroTipo('todos')} 
+                                className={`btn ${filtroTipo === 'todos' ? 'btn-primary' : 'btn-outline-primary'}`}
+                            >
+                                <i className="fas fa-users me-2"></i>
+                                Todos ({usuarios.length})
+                            </button>
+                            <button 
+                                onClick={() => setFiltroTipo('cliente')} 
+                                className={`btn ${filtroTipo === 'cliente' ? 'btn-primary' : 'btn-outline-primary'}`}
+                            >
+                                <i className="fas fa-user me-2"></i>
+                                Clientes ({usuarios.filter(u => u.tipo_usuario === 'cliente').length})
+                            </button>
+                            <button 
+                                onClick={() => setFiltroTipo('vendedor')} 
+                                className={`btn ${filtroTipo === 'vendedor' ? 'btn-primary' : 'btn-outline-primary'}`}
+                            >
+                                <i className="fas fa-store me-2"></i>
+                                Vendedores ({usuarios.filter(u => u.tipo_usuario === 'vendedor').length})
+                            </button>
+                            <button 
+                                onClick={() => setFiltroTipo('admin')} 
+                                className={`btn ${filtroTipo === 'admin' ? 'btn-primary' : 'btn-outline-primary'}`}
+                            >
+                                <i className="fas fa-user-shield me-2"></i>
+                                Admins ({usuarios.filter(u => u.tipo_usuario === 'admin').length})
+                            </button>
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <div className="input-group">
+                            <span className="input-group-text">
+                                <i className="fas fa-search text-muted"></i>
+                            </span>
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Buscar por nombre o email..."
+                                value={busqueda}
+                                onChange={(e) => setBusqueda(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Tabla de usuarios */}
+            <div className="bg-white rounded-3 shadow-sm p-4">
+                <div className="table-responsive">
+                    <table className="table table-hover align-middle mb-0">
+                        <thead className="table-light">
                             <tr>
-                                <td colSpan="8" style={{ textAlign: 'center' }}>No se encontraron resultados</td>
+                                <th>Usuario</th>
+                                <th>Contacto</th>
+                                <th>Tipo</th>
+                                <th>Local</th>
+                                <th>Estado</th>
+                                <th>Registro</th>
+                                <th className="text-end">Acciones</th>
                             </tr>
-                        ) : usuariosFiltrados.map(usuario => (
-                            <tr key={usuario.id}>
-                                <td>{usuario.nombre}</td>
-                                <td>{usuario.email}</td>
-                                <td>{usuario.telefono}</td>
-                                <td>{usuario.tipo_usuario}</td>
-                                <td>{usuario.local_nombre || '-'}</td>
-                                <td>{usuario.estado}</td>
-                                <td>{new Date(usuario.fecha_registro).toLocaleDateString()}</td>
-                                <td>
-                                    {usuario.tipo_usuario === 'vendedor' && (
-                                        <button onClick={() => abrirModalHorarios(usuario)} title="Horarios">📅</button>
-                                    )}
-                                    <button onClick={() => editarUsuario(usuario)} title="Editar">✏️</button>
-                                    <button onClick={() => eliminarUsuario(usuario.id)} title="Eliminar">🗑️</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {usuariosFiltrados.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="text-center py-5">
+                                        <i className="fas fa-users-slash text-muted fs-1 mb-3 d-block"></i>
+                                        <p className="text-muted mb-0">No se encontraron usuarios</p>
+                                    </td>
+                                </tr>
+                            ) : usuariosFiltrados.map(usuario => (
+                                <tr key={usuario.id}>
+                                    <td>
+                                        <div className="d-flex align-items-center">
+                                            <div className={`bg-light rounded-circle p-2 me-3 ${usuario.tipo_usuario === 'admin' ? 'bg-warning bg-opacity-25' : ''}`}>
+                                                <i className={`fas fa-${usuario.tipo_usuario === 'admin' ? 'user-shield text-warning' : usuario.tipo_usuario === 'vendedor' ? 'store text-primary' : 'user text-secondary'}`}></i>
+                                            </div>
+                                            <div>
+                                                <div className="fw-bold">{usuario.nombre}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="small">
+                                            <div><i className="fas fa-envelope me-1 text-muted"></i> {usuario.email}</div>
+                                            {usuario.telefono && <div><i className="fas fa-phone me-1 text-muted"></i> {usuario.telefono}</div>}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className={`badge ${
+                                            usuario.tipo_usuario === 'admin' ? 'bg-warning text-dark' : 
+                                            usuario.tipo_usuario === 'vendedor' ? 'bg-primary' : 
+                                            'bg-secondary'
+                                        }`}>
+                                            {usuario.tipo_usuario}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {usuario.local_nombre ? (
+                                            <div className="small">
+                                                <i className="fas fa-store me-1 text-primary"></i>
+                                                {usuario.local_nombre}
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted">-</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <span className={`badge ${usuario.estado === 'activo' ? 'bg-success' : 'bg-danger'}`}>
+                                            {usuario.estado}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="small text-muted">
+                                            <i className="fas fa-calendar-alt me-1"></i>
+                                            {new Date(usuario.fecha_registro).toLocaleDateString()}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="d-flex justify-content-end gap-2">
+                                            {usuario.tipo_usuario === 'vendedor' && (
+                                                <button 
+                                                    className="btn btn-sm btn-light" 
+                                                    onClick={() => abrirModalHorarios(usuario)}
+                                                    title="Ver horarios"
+                                                >
+                                                    <i className="fas fa-clock text-primary"></i>
+                                                </button>
+                                            )}
+                                            <button 
+                                                className="btn btn-sm btn-light"
+                                                onClick={() => editarUsuario(usuario)}
+                                                title="Editar usuario"
+                                            >
+                                                <i className="fas fa-edit text-primary"></i>
+                                            </button>
+                                            <button 
+                                                className="btn btn-sm btn-light"
+                                                onClick={() => eliminarUsuario(usuario.id)}
+                                                title="Eliminar usuario"
+                                            >
+                                                <i className="fas fa-trash text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
+            {/* Modal de usuario */}
             {mostrarModal && (
-                <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => setMostrarModal(false)}>
-                    <div className="modal-content" style={{ background: 'white', padding: 20, borderRadius: 8, minWidth: 320 }} onClick={e => e.stopPropagation()}>
-                        <h3>{usuarioSeleccionado ? 'Editar' : 'Nuevo'} Usuario</h3>
-                        <form onSubmit={guardarUsuarioLocal}>
-                            <div>
-                                <label>Nombre</label>
-                                <input required value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} />
+                <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    <i className={`fas fa-${usuarioSeleccionado ? 'edit' : 'user-plus'} me-2 ${usuarioSeleccionado ? 'text-primary' : 'text-success'}`}></i>
+                                    {usuarioSeleccionado ? 'Editar' : 'Nuevo'} Usuario
+                                </h5>
+                                <button type="button" className="btn-close" onClick={() => setMostrarModal(false)}></button>
                             </div>
-                            <div>
-                                <label>Email</label>
-                                <input required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
-                            </div>
-                            <div>
-                                <label>Teléfono</label>
-                                <input value={formData.telefono} onChange={e => setFormData({ ...formData, telefono: e.target.value })} />
-                            </div>
-
-                            <div>
-                                <label>Dirección</label>
-                                <input value={formData.direccion} onChange={e => setFormData({ ...formData, direccion: e.target.value })} />
-                            </div>
-
-                            <div>
-                                <label>Tienda</label>
-                                <input value={formData.tienda} onChange={e => setFormData({ ...formData, tienda: e.target.value })} />
-                            </div>
-
-                            <div>
-                                <label>Tipo</label>
-                                <select value={formData.tipo_usuario} onChange={e => setFormData({ ...formData, tipo_usuario: e.target.value })}>
-                                    <option value="cliente">Cliente</option>
-                                    <option value="vendedor">Vendedor</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                            {formData.tipo_usuario === 'vendedor' && (
-                                <div>
-                                    <label>Local</label>
-                                    <select value={formData.tienda_id} onChange={e => setFormData({ ...formData, tienda_id: e.target.value })}>
-                                        <option value="">-- ninguno --</option>
-                                        {tiendas.map(t => <option key={t.id} value={t.id}>{t.nombre}</option>)}
-                                    </select>
+                            <form onSubmit={guardarUsuarioLocal}>
+                                <div className="modal-body">
+                                    <div className="mb-3">
+                                        <label className="form-label">Nombre completo</label>
+                                        <input 
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Ej: Juan Pérez"
+                                            required 
+                                            value={formData.nombre} 
+                                            onChange={e => setFormData({ ...formData, nombre: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Email</label>
+                                        <input 
+                                            type="email"
+                                            className="form-control"
+                                            placeholder="Ej: juan@mail.com"
+                                            required 
+                                            value={formData.email} 
+                                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Teléfono</label>
+                                        <input 
+                                            type="tel"
+                                            className="form-control"
+                                            placeholder="Ej: +56 9 1234 5678"
+                                            value={formData.telefono} 
+                                            onChange={e => setFormData({ ...formData, telefono: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Tipo de usuario</label>
+                                        <select 
+                                            className="form-select"
+                                            value={formData.tipo_usuario} 
+                                            onChange={e => setFormData({ ...formData, tipo_usuario: e.target.value })}
+                                        >
+                                            <option value="cliente">Cliente</option>
+                                            <option value="vendedor">Vendedor</option>
+                                            <option value="admin">Administrador</option>
+                                        </select>
+                                    </div>
+                                    {formData.tipo_usuario === 'vendedor' && (
+                                        <div className="mb-3">
+                                            <label className="form-label">Local asignado</label>
+                                            <select 
+                                                className="form-select"
+                                                value={formData.tienda_id} 
+                                                onChange={e => setFormData({ ...formData, tienda_id: e.target.value })}
+                                            >
+                                                <option value="">Sin local asignado</option>
+                                                {tiendas.map(t => (
+                                                    <option key={t.id} value={t.id}>{t.nombre}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-                                <button type="submit">{usuarioSeleccionado ? 'Actualizar' : 'Crear'}</button>
-                                <button type="button" onClick={() => setMostrarModal(false)}>Cancelar</button>
-                            </div>
-                        </form>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-light" onClick={() => setMostrarModal(false)}>
+                                        <i className="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" className={`btn btn-${usuarioSeleccionado ? 'primary' : 'success'}`}>
+                                        <i className={`fas fa-${usuarioSeleccionado ? 'save' : 'plus'} me-2`}></i>
+                                        {usuarioSeleccionado ? 'Guardar cambios' : 'Crear usuario'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
@@ -233,4 +380,3 @@ const GestionUsuarios = () => {
 };
 
 export default GestionUsuarios;
-// ...existing code...

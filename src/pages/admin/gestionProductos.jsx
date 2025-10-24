@@ -164,38 +164,73 @@ const GestionProductos = () => {
 
     return ( 
          <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Gestión de Productos</h2>
-        <div>
-          <button className="btn btn-outline-secondary me-2" onClick={startCreate}>Nuevo</button>
-          <button className="btn btn-outline-info" onClick={async () => { await syncWithServer(); alert('Sync ejecutado'); }}>Sincronizar</button>
+      {/* Encabezado mejorado */}
+      <div className="bg-white rounded-3 shadow-sm p-4 mb-4">
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 className="mb-1">
+              <i className="fas fa-box-open me-2 text-primary"></i>
+              Gestión de Productos
+            </h2>
+            <p className="text-muted mb-0">Administra el catálogo de productos de todos los minimarkets</p>
+          </div>
+          <div className="d-flex gap-2">
+            <button className="btn btn-primary" onClick={startCreate}>
+              <i className="fas fa-plus me-2"></i>Nuevo Producto
+            </button>
+            <button className="btn btn-outline-primary" onClick={async () => { await syncWithServer(); alert('Sync ejecutado'); }}>
+              <i className="fas fa-sync-alt me-2"></i>Sincronizar
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="row">
 
         <div className="col-md-8">
-          <div className="list-group">
+          <div className="list-group shadow-sm">
             {productos.map(p => (
-              <div key={p.id} className="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <strong>{p.nombre}</strong><div className="text-muted">S/ {p.precio} • Stock: {p.stock}</div>
+              <div key={p.id} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-start border-5 border-primary border-opacity-25">
+                <div className="d-flex align-items-center gap-3">
+                  <div className="bg-light rounded p-2">
+                    <i className="fas fa-box text-primary fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 className="mb-0 fw-bold">{p.nombre}</h6>
+                    <div className="text-muted small">
+                      <span className="badge bg-success bg-opacity-10 text-success me-2">CLP ${p.precio.toLocaleString()}</span>
+                      <span className="badge bg-primary bg-opacity-10 text-primary">Stock: {p.stock}</span>
+                      {p.categoria && <span className="badge bg-info bg-opacity-10 text-info ms-2">{p.categoria}</span>}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => startEdit(p)}>Editar</button>
-                  <button className="btn btn-sm btn-danger" onClick={() => { if (window.confirm('Eliminar producto?')) deleteProduct(p.id); }}>Eliminar</button>
+                <div className="d-flex gap-2">
+                  <button className="btn btn-sm btn-light" onClick={() => startEdit(p)} title="Editar">
+                    <i className="fas fa-edit text-primary"></i>
+                  </button>
+                  <button className="btn btn-sm btn-light" onClick={() => { if (window.confirm('¿Estás seguro de eliminar este producto?')) deleteProduct(p.id); }} title="Eliminar">
+                    <i className="fas fa-trash text-danger"></i>
+                  </button>
                 </div>
               </div>
             ))}
-            {productos.length === 0 && <div className="text-muted p-3">No hay productos.</div>}
+            {productos.length === 0 && (
+              <div className="text-center py-5">
+                <i className="fas fa-box-open text-muted fs-1 mb-3"></i>
+                <p className="text-muted mb-0">No hay productos registrados</p>
+              </div>
+            )}
           </div>
   {/* Modal: menú detallado para agregar/editar/eliminar */}
   {showModal && (
-    <div className="modal show d-block" tabIndex="-1" role="dialog" onClick={() => setShowModal(false)}>
+    <div className="modal show d-block" tabIndex="-1" role="dialog" onClick={() => setShowModal(false)} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-lg" role="document" onClick={e => e.stopPropagation()}>
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">{editing ? 'Editar producto' : 'Nuevo producto'}</h5>
+        <div className="modal-content border-0 shadow-lg">
+          <div className="modal-header border-0 bg-primary bg-opacity-10">
+            <h5 className="modal-title">
+              <i className={`fas fa-${editing ? 'edit' : 'plus'} me-2 text-primary`}></i>
+              {editing ? 'Editar producto' : 'Nuevo producto'}
+            </h5>
             <button type="button" className="btn-close" aria-label="Close" onClick={() => setShowModal(false)}></button>
           </div>
           <div className="modal-body">
@@ -274,7 +309,7 @@ const GestionProductos = () => {
                   {productos.map((pp, i) => (
                     <div key={pp.id} className="d-flex justify-content-between align-items-center mb-2">
                       <div>
-                        <strong>{pp.nombre}</strong><div className="text-muted small">S/ {pp.precio} • {pp.stock}</div>
+                        <strong>{pp.nombre}</strong><div className="text-muted small">CLP ${pp.precio} • {pp.stock}</div>
                       </div>
                       <div>
                         <button className="btn btn-sm btn-outline-secondary me-1" onClick={() => { handleEdit(i); }}>Editar</button>
