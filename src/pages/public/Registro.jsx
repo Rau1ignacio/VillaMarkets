@@ -73,9 +73,10 @@ export default function Registro() {
     setForm((f) => ({ ...f, [field]: value }));
   };
 
+  // Validación del formulario
   const validate = () => {
     const e = {};
-
+  
     if (!form.nombre.trim()) e.nombre = "Ingresa tu nombre.";
     if (!form.apellidos.trim()) e.apellidos = "Ingresa tus apellidos.";
 
@@ -83,6 +84,7 @@ export default function Registro() {
     else if (!validarRut(form.rut)) e.rut = "RUT inválido.";
 
     if (!form.correo.trim()) e.correo = "Ingresa tu correo.";
+    else if (!/\S+@\S+\.\S+/.test(form.correo)) e.correo = "Correo inválido."; // valida los caracteres básicos como @ y .
     if (!form.confirmarCorreo.trim()) e.confirmarCorreo = "Confirma tu correo.";
     if (form.correo && form.confirmarCorreo && form.correo !== form.confirmarCorreo) {
       e.confirmarCorreo = "Los correos no coinciden.";
@@ -113,6 +115,7 @@ export default function Registro() {
     setTouched((t) => ({ ...t, rut: true }));
   };
 
+  // Manejar envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
     const eMap = validate();
@@ -175,6 +178,8 @@ export default function Registro() {
       <div className="invalid-feedback">{errors[field]}</div>
     ) : null;
 
+
+  // HTML ---------------------------------------------------------------------------------------------------------------------------
   return (
 
     <div className="container py-5">

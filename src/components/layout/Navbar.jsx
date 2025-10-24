@@ -1,9 +1,13 @@
 import { NavLink } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import logo from "../../images/Logos/Logotipo Transparente.png"; // dinamioca importacion de imagenes
 
 export default function Navbar({
   brandName = "Villa Markets",
+<<<<<<< HEAD
   brandLogo = "./src/images/Logos/Logotipo Transparente.png",
+=======
+>>>>>>> 6983468eb2663d2cb6ea79f196016128f8ea0959
   cartCount = 0,
 }) {
   return (
@@ -11,7 +15,7 @@ export default function Navbar({
       <div className="container">
         <NavLink className="navbar-brand fw-bold d-flex align-items-center gap-2" to="/">
           <img
-            src={brandLogo}
+            src={logo}
             alt={brandName}
             width="40"
             height="40"
@@ -70,4 +74,5 @@ export default function Navbar({
       </div>
     </nav>
   );
+  
 }

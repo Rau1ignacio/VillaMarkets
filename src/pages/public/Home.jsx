@@ -25,6 +25,7 @@ export default function Home() {
     { t: "Pan Integral 2x1", tag: "Nuevo", price: "—", color: "info" },
   ];
 
+  // HTML ---------------------------------------------------------------------------------------------------------------------------
   return (
     <div className="home-bg">
       {/* H E R O */}

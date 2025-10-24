@@ -1,19 +1,20 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #821515;
     color: #333;
+
 }
 
 
 
 .cliente-inicio {
     min-height: 100vh;
-    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    background: linear-gradient(135deg, #7c8d1e 0%, #2ecc71 100%);
 }
 
 .cliente-header {
-    background: white;
+    background: rgb(232, 225, 225);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 1rem 0;
 }
