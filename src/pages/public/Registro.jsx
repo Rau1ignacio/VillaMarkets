@@ -43,6 +43,7 @@ export default function Registro() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
+    tipoUsuario: "cliente", // Nuevo campo para tipo de usuario
     nombre: "",
     apellidos: "",
     rut: "",
@@ -54,6 +55,19 @@ export default function Registro() {
     password: "",
     confirmarPassword: "",
     terminos: false,
+    // Campos específicos para administrador de minimarket
+    nombreMinimarket: "",
+    direccionMinimarket: "",
+    descripcionMinimarket: "",
+    horariosAtencion: {
+      lunes: { abierto: true, inicio: "09:00", fin: "18:00" },
+      martes: { abierto: true, inicio: "09:00", fin: "18:00" },
+      miercoles: { abierto: true, inicio: "09:00", fin: "18:00" },
+      jueves: { abierto: true, inicio: "09:00", fin: "18:00" },
+      viernes: { abierto: true, inicio: "09:00", fin: "18:00" },
+      sabado: { abierto: true, inicio: "09:00", fin: "14:00" },
+      domingo: { abierto: false, inicio: "09:00", fin: "14:00" }
+    }
   });
 
   const [errors, setErrors] = useState({});
@@ -82,6 +96,19 @@ export default function Registro() {
 
     if (!form.rut.trim()) e.rut = "Ingresa tu RUT.";
     else if (!validarRut(form.rut)) e.rut = "RUT inválido.";
+
+    // Validaciones específicas para administrador de minimarket
+    if (form.tipoUsuario === "admin") {
+      if (!form.nombreMinimarket.trim()) {
+        e.nombreMinimarket = "Ingresa el nombre del minimarket.";
+      }
+      if (!form.direccionMinimarket.trim()) {
+        e.direccionMinimarket = "Ingresa la dirección del minimarket.";
+      }
+      if (!form.descripcionMinimarket.trim()) {
+        e.descripcionMinimarket = "Ingresa una descripción del minimarket.";
+      }
+    }
 
     if (!form.correo.trim()) e.correo = "Ingresa tu correo.";
     else if (!/\S+@\S+\.\S+/.test(form.correo)) e.correo = "Correo inválido."; // valida los caracteres básicos como @ y .
@@ -141,11 +168,25 @@ export default function Registro() {
       apellidos: form.apellidos.trim(),
       rut: formatearRut(form.rut),
       email: form.correo.trim(),
+      correo: form.correo.trim(),
       direccion: form.direccion.trim(),
       telefono: form.telefono.trim(),
       dieta: form.dieta,
-      password: form.password, // solo para demo/login local
-      rol: "cliente",
+      password: form.password,
+      clave: form.password,
+      usuario: form.correo.split('@')[0],
+      tipoUsuario: form.tipoUsuario,
+      rol: form.tipoUsuario,
+      // Incluir datos del minimarket si es admin
+      ...(form.tipoUsuario === "admin" && {
+        minimarket: {
+          nombre: form.nombreMinimarket.trim(),
+          direccion: form.direccionMinimarket.trim(),
+          descripcion: form.descripcionMinimarket.trim(),
+          horarios: form.horariosAtencion,
+          estado: 'pendiente' // El admin del sistema debe aprobar el minimarket
+        }
+      })
     };
 
     // Persistencia simulada
@@ -158,13 +199,17 @@ export default function Registro() {
     const done = () =>
       navigate("/", { replace: true }); // redirige al Home (ajusta ruta si es necesario)
 
-    if (window.Swal) {
-      window.Swal.fire({
-        icon: "success",
-        title: "¡Registro exitoso!",
-        text: "Bienvenido a Villa Markets. Tu cuenta ha sido creada correctamente.",
-        confirmButtonColor: "#2d8f3c",
-      }).then(done);
+      if (window.Swal) {
+        const mensajeAdmin = form.tipoUsuario === "admin" 
+          ? "Tu solicitud será revisada por nuestro equipo. Te notificaremos cuando tu cuenta sea aprobada."
+          : "Tu cuenta ha sido creada correctamente.";
+
+        window.Swal.fire({
+          icon: "success",
+          title: "¡Registro exitoso!",
+          text: `Bienvenido a Villa Markets. ${mensajeAdmin}`,
+          confirmButtonColor: "#2d8f3c",
+        }).then(done);
     } else {
       alert("¡Registro exitoso!");
       done();
@@ -191,7 +236,166 @@ export default function Registro() {
           Completa el formulario para registrarte en Villa Markets
         </p>
 
-        <form onSubmit={handleSubmit} noValidate>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const eMap = validate();
+            setErrors(eMap);
+            setTouched({
+              nombre: true,
+              apellidos: true,
+              rut: true,
+              correo: true,
+              confirmarCorreo: true,
+              direccion: true,
+              telefono: true,
+              password: true,
+              confirmarPassword: true,
+              terminos: true,
+            });
+            if (Object.keys(eMap).length > 0) return;
+
+            // Construir usuario simulado (misma lógica que handleSubmit pero redirige a /login)
+            const nuevoUsuario = {
+              nombre: form.nombre.trim(),
+              apellidos: form.apellidos.trim(),
+              rut: formatearRut(form.rut),
+              email: form.correo.trim(),
+              direccion: form.direccion.trim(),
+              telefono: form.telefono.trim(),
+              dieta: form.dieta,
+              password: form.password,
+              rol: form.tipoUsuario,
+              ...(form.tipoUsuario === "admin" && {
+                minimarket: {
+                  nombre: form.nombreMinimarket.trim(),
+                  direccion: form.direccionMinimarket.trim(),
+                  descripcion: form.descripcionMinimarket.trim(),
+                  horarios: form.horariosAtencion,
+                  estado: "pendiente",
+                },
+              }),
+            };
+
+            localStorage.setItem("usuarioActual", JSON.stringify(nuevoUsuario));
+            const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            usuarios.push(nuevoUsuario);
+            localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+            const done = () => navigate("/login", { replace: true }); // <- redirige a Login.jsx
+
+            if (window.Swal) {
+              const mensajeAdmin =
+                form.tipoUsuario === "admin"
+                  ? "Tu solicitud será revisada por nuestro equipo. Te notificaremos cuando tu cuenta sea aprobada."
+                  : "Tu cuenta ha sido creada correctamente.";
+
+              window.Swal
+                .fire({
+                  icon: "success",
+                  title: "¡Registro exitoso!",
+                  text: `Bienvenido a Villa Markets. ${mensajeAdmin}`,
+                  confirmButtonColor: "#2d8f3c",
+                })
+                .then(done);
+            } else {
+              alert("¡Registro exitoso!");
+              done();
+            }
+          }}
+          noValidate
+        >
+          {/* Selector de tipo de usuario */}
+          <div className="mb-4">
+            <div className="row justify-content-center text-center">
+              <div className="col-md-6">
+                <label className="form-label d-block mb-3">¿Cómo deseas registrarte?</label>
+                <div className="btn-group" role="group">
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    name="tipoUsuario"
+                    id="tipoCliente"
+                    value="cliente"
+                    checked={form.tipoUsuario === "cliente"}
+                    onChange={(e) => setField("tipoUsuario", e.target.value)}
+                  />
+                  <label className="btn btn-outline-primary" htmlFor="tipoCliente">
+                    <i className="fas fa-user me-2"></i>
+                    Cliente
+                  </label>
+
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    name="tipoUsuario"
+                    id="tipoAdmin"
+                    value="admin"
+                    checked={form.tipoUsuario === "admin"}
+                    onChange={(e) => setField("tipoUsuario", e.target.value)}
+                  />
+                  <label className="btn btn-outline-primary" htmlFor="tipoAdmin">
+                    <i className="fas fa-store me-2"></i>
+                    Administrador de Minimarket
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Campos específicos para administrador de minimarket */}
+          {form.tipoUsuario === "admin" && (
+            <div className="border rounded p-4 mb-4 bg-light">
+              <h5 className="mb-3">
+                <i className="fas fa-store me-2"></i>
+                Información del Minimarket
+              </h5>
+              
+              <div className="mb-3">
+                <label htmlFor="nombreMinimarket" className="form-label">Nombre del Minimarket</label>
+                <input
+                  id="nombreMinimarket"
+                  type="text"
+                  className={`form-control ${invalid("nombreMinimarket")}`}
+                  value={form.nombreMinimarket}
+                  onChange={(e) => setField("nombreMinimarket", e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, nombreMinimarket: true }))}
+                  required
+                />
+                {feedback("nombreMinimarket")}
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="direccionMinimarket" className="form-label">Dirección del Minimarket</label>
+                <input
+                  id="direccionMinimarket"
+                  type="text"
+                  className={`form-control ${invalid("direccionMinimarket")}`}
+                  value={form.direccionMinimarket}
+                  onChange={(e) => setField("direccionMinimarket", e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, direccionMinimarket: true }))}
+                  required
+                />
+                {feedback("direccionMinimarket")}
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="descripcionMinimarket" className="form-label">Descripción del Minimarket</label>
+                <textarea
+                  id="descripcionMinimarket"
+                  className={`form-control ${invalid("descripcionMinimarket")}`}
+                  value={form.descripcionMinimarket}
+                  onChange={(e) => setField("descripcionMinimarket", e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, descripcionMinimarket: true }))}
+                  rows="3"
+                  placeholder="Describe brevemente tu minimarket..."
+                  required
+                />
+                {feedback("descripcionMinimarket")}
+              </div>
+            </div>
+          )}
+
           <div className="row">
             <div className="col-md-6 mb-3">
               <label htmlFor="nombre" className="form-label">Nombre</label>

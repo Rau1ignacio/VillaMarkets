@@ -51,28 +51,25 @@ export default function Login() {
       // Normalizar datos del usuario
       if (!user.email && user.correo) user.email = user.correo;
       if (!user.correo && user.email) user.correo = user.email;
-      if (user.rol === "administrador") user.rol = "admin";
-      
+      if (user.tipoUsuario === "admin") user.rol = "admin";
+      else if (user.tipoUsuario === "cliente") user.rol = "cliente";
+      else if (user.rol === "administrador") user.rol = "admin";
 
       // Guardar usuario actual en localStorage
       localStorage.setItem("usuarioActual", JSON.stringify(user));
 
       // Debug: mostrar información del usuario
       console.log("Usuario logueado:", user);
+      console.log("Tipo de usuario:", user.tipoUsuario);
       console.log("Rol del usuario:", user.rol);
 
       // Redireccionar según el rol del usuario
-      if (user.rol === "admin") {
+      if (user.tipoUsuario === "admin" || user.rol === "admin") {
         console.log("Redirigiendo a /admin");
         navigate("/admin", { replace: true });
-
-      } else if (user.rol === "cliente") {
+      } else {
         console.log("Redirigiendo a /perfil");
         navigate("/perfil", { replace: true });
-        
-      } else {
-        console.log("Rol no reconocido, redirigiendo a /Home por defecto");
-        navigate("/Home", { replace: true });
       }
     }, 500); // micro delay para animación
   };

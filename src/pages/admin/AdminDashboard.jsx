@@ -3,6 +3,8 @@ import '../../styles/AdminDashboard.css';
 import { useNavigate } from 'react-router-dom';
 import Logo from "../../images/Logos/Logotipo Transparente.png"
 
+
+// Simuladores de datos para el dashboard
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const [stats, setStats] = useState({
@@ -34,7 +36,7 @@ const AdminDashboard = () => {
         navigate('/login');
     };
 
-
+    // HTML ---------------------------------------------------------------------------------------------------------------------------
     return (
         <div className="admin-dashboard bg-light">
             <main className="admin-content">
