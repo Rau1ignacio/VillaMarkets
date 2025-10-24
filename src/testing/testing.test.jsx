@@ -1,49 +1,47 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom';
+import Producto from '../pages/cliente/Producto.jsx';
+import { render, screen, fireEvent } from '@testing-library/react';
 
-import { expect, test, beforeAll } from '@jest/globals';
+// eslint-disable-next-line no-undef
+describe('Catálogo de Productos', () => {
+  // eslint-disable-next-line no-undef
+  afterEach(() => {
+    window.localStorage.clear();
+  });
 
-let AdminDashboard;
-let AdminLayout;
-// Cargar los componentes de forma asíncrona antes de las pruebas
-beforeAll(async () => {
-  AdminDashboard = (await import('../pages/admin/AdminDashboard')).default;
-  AdminLayout = (await import('../components/layout/AdminLayout')).default;
-});
-// renderizar el botón Gestión de Pedidos
-test('renderiza el botón Gestión de Pedidos', () => {
-  render(
-    <MemoryRouter>
-      <AdminDashboard />
-    </MemoryRouter>
-  );
-  expect(screen.getByRole('button', { name: /ver pedidos|ver pedidos/i })).toBeInTheDocument();
-});
-// Test navigation to /admin/gestion-pedidos on button click
-test('al hacer click en Gestión de Pedidos navega a /admin/gestion-pedidos', () => {
-  render(
-    <MemoryRouter initialEntries={["/admin"]}>
-      <Routes>
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/gestion-pedidos" element={<div data-testid="location">/admin/gestion-pedidos</div>} />
-      </Routes>
-    </MemoryRouter>
-  );
-/// Simular el click en el botón
-  const btn = screen.getByRole('button', { name: /ver pedidos/i });
-  fireEvent.click(btn);
-// Verificar que la URL ha cambiado
-  expect(screen.getByTestId('location').textContent).toBe('/admin/gestion-pedidos');
-});
-///  Test para el botón de perfil
-test('muestra el botón Perfil en el layout del admin', () => {
-  render(
-    <MemoryRouter>
-      <AdminLayout />
-    </MemoryRouter>
-  );
-  // The Perfil option exists in the DOM within the layout's dropdown menu
-  expect(screen.getByRole('button', { name: /perfil/i })).toBeInTheDocument();
+  // eslint-disable-next-line no-undef
+  it('muestra mensaje cuando no hay productos', () => {
+    window.localStorage.setItem('productos', JSON.stringify([]));
+  render(<Producto />);
+  // Simula una búsqueda que no existe
+  const input = screen.getByPlaceholderText(/buscar productos/i);
+  fireEvent.change(input, { target: { value: 'zzzzzzzzzz' } });
+  // eslint-disable-next-line no-undef
+  expect(screen.getByText(/no se encontraron productos que coincidan con los criterios de búsqueda/i)).toBeInTheDocument();
+  });
+
+  // eslint-disable-next-line no-undef
+  it('muestra un producto en el catálogo', () => {
+    window.localStorage.setItem('productos', JSON.stringify([
+      {
+        id: 1,
+        nombre: 'Arroz Integral',
+        precio: 1290,
+        imagen: 'arroz_integrall.webp',
+        descripcion: 'Arroz integral 1kg, marca Villa Markets',
+        categoria: 'abarrotes',
+        stock: 15,
+        minimarket: 'Villa Central'
+      }
+    ]));
+    render(<Producto />);
+    
+    const arrozElements = screen.getAllByText(/arroz integral/i);
+  // eslint-disable-next-line no-undef
+  expect(arrozElements.length).toBeGreaterThan(0);
+    // eslint-disable-next-line no-undef
+    expect(screen.getByText(/villa central/i)).toBeInTheDocument();
+    // eslint-disable-next-line no-undef
+  expect(screen.getByText(/S\/\s*1\.290/i)).toBeInTheDocument();
+  });
 });

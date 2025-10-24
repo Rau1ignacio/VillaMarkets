@@ -1,6 +1,7 @@
 import React from 'react';
 import './AdminDashboard.css';
 import { useNavigate } from 'react-router-dom';
+import Logo from "../../images/Logos/Logotipo Transparente.png"
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -10,10 +11,8 @@ const AdminDashboard = () => {
         window.location.href = '/login';
     };
 
-    // Función para navegar a Gestión de Pedidos
-    const handleGestionPedidos = () => {
-    navigate('/admin/gestion-pedidos');
-    };
+   
+    
     // Función para navegar a Gestión de Productos
     const handleGestionProductos = () => {
         navigate('/admin/gestion-productos');
@@ -27,10 +26,7 @@ const AdminDashboard = () => {
     const handleGestionTiendas = () => {
         navigate('/admin/tiendas');
     };
-    // Función para navegar a Configuración
-    const handleConfiguracion = () => {
-        navigate('/admin/configuracion');
-    };
+    
     // función para navegar a Reportes
     const handleReportes = () => {
         navigate('/admin/reportes');
@@ -158,26 +154,7 @@ const AdminDashboard = () => {
                         </div>
 
                         {/* Gestión de Pedidos */}
-                        <div className="col-12 col-sm-6 col-lg-4">
-                            <div className="admin-card card h-100 shadow-sm border-0">
-                                <div className="card-body text-center p-4">
-                                    <div className="icon-circle bg-warning bg-opacity-10 mb-3 mx-auto">
-                                        <i className="fas fa-shopping-cart text-warning fs-2"></i>
-                                    </div>
-                                    <h5 className="card-title fw-bold">Gestión de Pedidos</h5>
-                                    <p className="card-text text-muted">
-                                        Ver y procesar pedidos
-                                    </p>
-                                    <button 
-                                        onClick={handleGestionPedidos}
-                                        className="btn btn-warning btn-sm w-100"
-                                    >
-                                        <i className="fas fa-eye me-2"></i>
-                                        Ver Pedidos
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        
 
                         {/* Reportes */}
                         <div className="col-12 col-sm-6 col-lg-4">
@@ -224,26 +201,7 @@ const AdminDashboard = () => {
                         </div>
 
                         {/* Configuración */}
-                        <div className="col-12 col-sm-6 col-lg-4">
-                            <div className="admin-card card h-100 shadow-sm border-0">
-                                <div className="card-body text-center p-4">
-                                    <div className="icon-circle bg-dark bg-opacity-10 mb-3 mx-auto">
-                                        <i className="fas fa-cogs text-dark fs-2"></i>
-                                    </div>
-                                    <h5 className="card-title fw-bold">Configuración</h5>
-                                    <p className="card-text text-muted">
-                                        Ajustes del sistema
-                                    </p>
-                                    <button 
-                                        onClick={handleConfiguracion}
-                                        className="btn btn-dark btn-sm w-100"
-                                    >
-                                        <i className="fas fa-cog me-2"></i>
-                                        Configurar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
             </main>

@@ -192,6 +192,17 @@ const GestionUsuarios = () => {
                                 <label>Teléfono</label>
                                 <input value={formData.telefono} onChange={e => setFormData({ ...formData, telefono: e.target.value })} />
                             </div>
+
+                            <div>
+                                <label>Dirección</label>
+                                <input value={formData.direccion} onChange={e => setFormData({ ...formData, direccion: e.target.value })} />
+                            </div>
+
+                            <div>
+                                <label>Tienda</label>
+                                <input value={formData.tienda} onChange={e => setFormData({ ...formData, tienda: e.target.value })} />
+                            </div>
+
                             <div>
                                 <label>Tipo</label>
                                 <select value={formData.tipo_usuario} onChange={e => setFormData({ ...formData, tipo_usuario: e.target.value })}>

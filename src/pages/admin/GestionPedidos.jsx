@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './GestionPedidos.css';
+import Logo from "../../images/Logos/Logotipo Transparente.png"
 
 
 const GestionPedidos = () => {
@@ -43,13 +44,13 @@ const GestionPedidos = () => {
                 fecha: '2025-10-15',
                 hora: '14:30',
                 estado: 'pendiente',
-                total: 45.50,
+                total: 4550,
                 tienda: 'Minimarket Central',
                 direccion: 'Av. Principal 123',
                 productos: [
-                    { nombre: 'Coca Cola 2L', cantidad: 2, precio: 16.00 },
-                    { nombre: 'Pan Integral', cantidad: 1, precio: 3.50 },
-                    { nombre: 'Leche Entera 1L', cantidad: 3, precio: 26.00 }
+                    { nombre: 'Coca Cola 2L', cantidad: 2, precio: 1600 },
+                    { nombre: 'Pan Integral', cantidad: 1, precio: 350 },
+                    { nombre: 'Leche Entera 1L', cantidad: 3, precio: 2600 }
                 ]
             },
             {
@@ -60,13 +61,13 @@ const GestionPedidos = () => {
                 fecha: '2025-10-15',
                 hora: '16:15',
                 estado: 'preparando',
-                total: 78.25,
+                total:  9825,
                 tienda: 'Minimarket Norte',
                 direccion: 'Calle Los Olivos 456',
                 productos: [
-                    { nombre: 'Arroz 1kg', cantidad: 2, precio: 12.00 },
-                    { nombre: 'Aceite Vegetal', cantidad: 1, precio: 25.00 },
-                    { nombre: 'Detergente', cantidad: 1, precio: 41.25 }
+                    { nombre: 'Arroz 1kg', cantidad: 2, precio: 1200 },
+                    { nombre: 'Aceite Vegetal', cantidad: 1, precio: 2500 },
+                    { nombre: 'Detergente', cantidad: 1, precio: 4125 }
                 ]
             }
         ];

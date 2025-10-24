@@ -1,5 +1,6 @@
 (function(){})();
 import React, { useEffect, useState } from 'react'
+import './Tiendas.css';
 
 const STORAGE_KEY = 'vm_stores'
 

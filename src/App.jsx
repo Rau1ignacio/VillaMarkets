@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
 
@@ -33,9 +33,15 @@ import Producto from "./pages/cliente/Producto.jsx";
 // import Pedidos from "./pages/public/Pedidos.jsx";
 
 function App() {
+  const location = useLocation();
+  // Ocultar Navbar en AdminDashboard y ClienteInicio
+  const hideNavbar = [
+    '/admin',
+    '/clienteinicio'
+  ].some(prefix => location.pathname === prefix || location.pathname.startsWith(prefix + '/'));
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
-      <Navbar />
+      {!hideNavbar && <Navbar />}
       <main className="flex-grow-1">
         <Routes>
           <Route path="/" element={<Home />} />

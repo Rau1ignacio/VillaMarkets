@@ -1,78 +1,68 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const MisPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
 
   useEffect(() => {
-    // Simulación: cargar pedidos desde localStorage o backend
     const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
-    setPedidos(pedidosGuardados);
+    setPedidos(pedidosGuardados.reverse()); // Mostrar el más reciente primero
   }, []);
 
-  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
-
   return (
-    <div>
+    <div className="container py-4">
       <h2>Historial de Compras</h2>
       {pedidos.length === 0 ? (
-        <p>No tienes pedidos aún.</p>
+        <p>No tienes compras registradas.</p>
       ) : (
-        pedidos.map((pedido, idx) => (
-          <div key={idx} style={{ border: '1px solid #ccc', margin: 10, padding: 10 }}>
-            <p><b>Fecha:</b> {pedido.fecha}</p>
-            <p><b>Total:</b> S/ {pedido.total}</p>
-            <p><b>Estado:</b> {pedido.estado || 'Procesando'}</p>
-            <p><b>Método de pago:</b> {pedido.metodoPago || 'No especificado'}</p>
-            <p><b>Dirección de entrega:</b> {pedido.direccion || 'No especificada'}</p>
-            <ul>
-              {pedido.productos.map((prod, i) => (
-                <li key={i} style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-                  <img
-                    src={prod.imagen ? `/images/${prod.imagen}` : '/images/default.jpg'}
-                    alt={prod.nombre}
-                    style={{ width: 40, height: 40, objectFit: 'contain', marginRight: 10, borderRadius: 6 }}
-                    onError={e => { e.target.src = '/images/default.jpg'; }}
-                  />
-                  <span>
-                    {prod.nombre} - {prod.cantidad} x S/ {prod.precio} <br />
-                    <small>Minimarket: {prod.minimarket}</small>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <button onClick={() => setPedidoSeleccionado(pedido)}>
-              Ver detalles
-            </button>
+        <>
+          <div className="mb-3">
+            <Link to="/cliente/producto" className="btn btn-green me-2">
+              Seguir comprando
+            </Link>
+            <Link to="/cliente/micarrito" className="btn btn-secondary">
+              Ir al carrito
+            </Link>
           </div>
-        ))
-      )}
-      {/* Mostrar detalles del pedido seleccionado */}
-      {pedidoSeleccionado && (
-        <div style={{ background: '#d88f8fff', padding: 20, marginTop: 20 }}>
-          <h3>Detalles del Pedido</h3>
-          <p><b>Fecha:</b> {pedidoSeleccionado.fecha}</p>
-          <p><b>Total:</b> S/ {pedidoSeleccionado.total}</p>
-          <p><b>Estado:</b> {pedidoSeleccionado.estado || 'Procesando'}</p>
-          <p><b>Método de pago:</b> {pedidoSeleccionado.metodoPago || 'No especificado'}</p>
-          <p><b>Dirección de entrega:</b> {pedidoSeleccionado.direccion || 'No especificada'}</p>
-          <ul>
-            {pedidoSeleccionado.productos.map((prod, i) => (
-              <li key={i} style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-                <img
-                  src={prod.imagen ? `/images/${prod.imagen}` : '/images/default.jpg'}
-                  alt={prod.nombre}
-                  style={{ width: 40, height: 40, objectFit: 'contain', marginRight: 10, borderRadius: 6 }}
-                  onError={e => { e.target.src = '/images/default.jpg'; }}
-                />
-                <span>
-                  {prod.nombre} - {prod.cantidad} x S/ {prod.precio} <br />
-                  <small>Minimarket: {prod.minimarket}</small>
-                </span>
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => setPedidoSeleccionado(null)}>Cerrar</button>
-        </div>
+          <table className="table table-bordered table-striped mt-3">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Productos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pedidos.map((pedido, idx) => (
+                <tr key={idx}>
+                  <td>{pedido.fecha}</td>
+                  <td>{pedido.hora}</td>
+                  <td>{pedido.nombreCliente || (pedido.datosPago && pedido.datosPago.nombre) || '-'}</td>
+                  <td>S/ {pedido.total.toLocaleString('es-CL')}</td>
+                  <td>{pedido.estado}</td>
+                  <td>
+                    <ul style={{margin:0, padding:0, listStyle:'none'}}>
+                      {pedido.productos.map((prod, i) => (
+                        <li key={i} style={{display:'flex',alignItems:'center',marginBottom:4}}>
+                          <img
+                            src={prod.imagen ? (prod.imagen.startsWith('http') ? prod.imagen : `/images/productos/${prod.imagen}`) : '/images/default.jpg'}
+                            alt={prod.nombre}
+                            style={{width:32, height:32, objectFit:'contain', borderRadius:4, marginRight:8}}
+                            onError={e => { e.target.src = '/images/default.jpg'; }}
+                          />
+                          <span>{prod.nombre} x{prod.cantidad}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   );

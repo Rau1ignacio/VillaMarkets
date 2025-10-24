@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f4f4f4;
+    background: #861414;
 }
 
 
@@ -13,7 +13,7 @@ body {
 }
 
 .admin-header {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(205, 35, 35, 0.95) !important;
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }

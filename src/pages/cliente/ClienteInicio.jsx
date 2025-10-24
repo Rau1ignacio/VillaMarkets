@@ -40,12 +40,9 @@ const ClienteInicio = () => {
         navigate('./Perfil');
     };
 
-    const handleOfertas = () => {
-        navigate('./ofertas');
-    }
-    const handleMisPedidos = () => {
-        navigate('./mis-pedidos');
-    };
+    
+    
+    
 
     const handleMiCarrito = () => {
         navigate('./micarrito');
@@ -86,11 +83,7 @@ const ClienteInicio = () => {
                         <button className="cliente-btn" onClick={handleMiCarrito}>Ver Carrito</button>
                     </div>
 
-                    <div className="cliente-card">
-                        <h3>📋 Mis Pedidos</h3>
-                        <p>Historial de compras</p>
-                        <button className="cliente-btn" onClick={handleMisPedidos}>Ver Pedidos</button>
-                    </div>
+                    
 
                     <div className="cliente-card">
                         <h3>👤 Mi Perfil</h3>
@@ -98,11 +91,7 @@ const ClienteInicio = () => {
                         <button className="cliente-btn" onClick={handlePerfil}>Ver Perfil</button>
                     </div>
 
-                    <div className="cliente-card">
-                        <h3>🎯 Ofertas</h3>
-                        <p>Descuentos especiales</p>
-                        <button className="cliente-btn" onClick={handleOfertas}>Ver Ofertas</button>
-                    </div>
+                    
                 </div>
             </div>
         </div>

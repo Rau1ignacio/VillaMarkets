@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import MetodoPago from './MetodoPago';
+import Producto from './Producto';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const ENVIO_COSTO = 2990;
 const IVA_PORCENTAJE = 0.19;
@@ -20,6 +21,7 @@ const MiCarrito = () => {
   const [envioGratis, setEnvioGratis] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [confirmado, setConfirmado] = useState(false);
+  const navigate = useNavigate();
   /// useEffect para cargar el carrito desde localStorage
   useEffect(() => {
     const carritoGuardado = JSON.parse(localStorage.getItem('carrito')) || [];
@@ -59,8 +61,10 @@ const MiCarrito = () => {
   const handleConfirmarPago = async (datosPago) => {
     await descontarStock();
     const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
+    const ahora = new Date();
     const nuevoPedido = {
-      fecha: new Date().toLocaleString(),
+      fecha: ahora.toLocaleDateString(),
+      hora: ahora.toLocaleTimeString(),
       total: calcularTotal(),
       estado: 'Procesando',
       metodoPago: 'Pago en línea',
@@ -69,6 +73,7 @@ const MiCarrito = () => {
       envio: calcularEnvio(),
       iva: calcularIVA(calcularSubtotal()),
       productos: carrito,
+      nombreCliente: datosPago.nombre || '',
       datosPago
     };
     pedidosGuardados.push(nuevoPedido);
@@ -81,6 +86,10 @@ const MiCarrito = () => {
     setConfirmado(true);
     setPagoDatos(datosPago);
     setMostrarMetodoPago(false);
+    // Redirigir automáticamente al historial después de 2 segundos
+    setTimeout(() => {
+      navigate('/cliente/mispedidos');
+    }, 2000);
   };
 
   // CRUD: Eliminar producto del carrito
@@ -135,7 +144,13 @@ const MiCarrito = () => {
                 <tr key={idx}>
                   <td style={{ display: 'flex', alignItems: 'center' }}>
                     <img
-                      src={prod.imagen ? `./images/Logos/Logotipo Transparente.png` : '/images/default.jpg'}
+                      src={
+                        prod.imagen
+                          ? prod.imagen.startsWith('http')
+                            ? prod.imagen
+                            : `/images/productos/${prod.imagen}`
+                          : '/images/default.jpg'
+                      }
                       alt={`${prod.nombre} thumbnail sold by ${prod.minimarket}, price S/ ${prod.precio}, quantity ${prod.cantidad}. Neutral product photo on light background, factual informative tone`}
                       style={{ width: 40, height: 40, objectFit: 'contain', marginRight: 10, borderRadius: 6 }}
                       onError={e => { e.target.src = '/images/default.jpg'; }}
@@ -208,6 +223,9 @@ const MiCarrito = () => {
               <p>Comprobante subido: <b>{pagoDatos.comprobante.name}</b></p>
             </div>
           )}
+          <div style={{marginTop:16}}>
+            <span>Redirigiendo al historial de compras...</span>
+          </div>
         </div>
       )}
     </div>

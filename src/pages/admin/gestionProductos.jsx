@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Tiendas from './Tiendas';
 
 
 
@@ -16,7 +17,7 @@ const GestionProductos = () => {
     minimarket: ''
   });
     const [showModal, setShowModal] = useState(false);
-
+/// Cargar productos desde localStorage al montar el componente
   useEffect(() => {
     const productosGuardados = JSON.parse(localStorage.getItem('productos'));
     if (productosGuardados && productosGuardados.length > 0) {
@@ -45,6 +46,10 @@ const GestionProductos = () => {
 
   const handleCreate = (e) => {
     e.preventDefault();
+    if (!form.imagen || form.imagen.trim() === '') {
+      alert('Debes ingresar el nombre de la imagen o URL para el producto.');
+      return;
+    }
     const nuevo = { id: Date.now(), ...form };
     const nuevosProductos = [nuevo, ...productos];
     setProductos(nuevosProductos);
@@ -99,6 +104,24 @@ const GestionProductos = () => {
     });
     };
 
+    const [tiendas, setTiendas] = useState([]);
+      useEffect(() => {
+  // ...tu código de productos...
+  // Cargar tiendas desde localStorage
+        const tiendasGuardadas = JSON.parse(localStorage.getItem('vm_stores')) || [];
+        setTiendas(tiendasGuardadas);
+    }, []);
+// ...resto del código...
+
+// En el formulario:
+  <select name="minimarket" className="form-select" value={form.minimarket} onChange={handleChange} required>
+      <option value="">Selecciona un minimarket</option>
+      {tiendas.map(t => (
+      <option key={t.id} value={t.name}>{t.name}</option>
+        ))}
+    </select>
+      
+
 
         
 
@@ -120,6 +143,7 @@ const GestionProductos = () => {
             setShowModal(true);
         }
     };
+    
     // 
     const handleSubmit = (e) => {
         if (editing) {
@@ -187,8 +211,18 @@ const GestionProductos = () => {
                     <input name="precio" className="form-control" type="number" placeholder="Precio" value={form.precio} onChange={handleChange} min="0" required />
                   </div>
                   <div className="mb-2">
-                    <label className="form-label">Imagen (nombre de archivo)</label>
-                    <input name="imagen" className="form-control" placeholder="Ej: arroz.jpg" value={form.imagen} onChange={handleChange} />
+                    <label className="form-label">Imagen (nombre de archivo o URL)</label>
+                    <input name="imagen" className="form-control" placeholder="Ej: arroz.jpg o https://..." value={form.imagen} onChange={handleChange} />
+                    {form.imagen && (
+                      <div className="mt-2">
+                        <img
+                          src={form.imagen.startsWith('http') ? form.imagen : `/images/${form.imagen}`}
+                          alt="Vista previa"
+                          style={{ maxWidth: '100%', maxHeight: 120, borderRadius: 8, border: '1px solid #ccc' }}
+                          onError={e => { e.target.src = '/images/default.jpg'; }}
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="mb-2">
                     <label className="form-label">Descripción</label>
@@ -204,6 +238,12 @@ const GestionProductos = () => {
                       <option value="limpieza">Limpieza</option>
                       <option value="bebidas">Bebidas</option>
                       <option value="panaderia">Panadería</option>
+                      <option value="congelados">Congelados</option>
+                      <option value="otros">Otros</option>
+                      <option value="snacks">Snacks</option>
+
+
+                      
                     </select>
                   </div>
                   <div className="mb-2">
@@ -218,6 +258,8 @@ const GestionProductos = () => {
                       <option value="Villa Norte">Villa Norte</option>
                       <option value="Villa Este">Villa Este</option>
                       <option value="Villa Sur">Villa Sur</option>
+                      <option value="Villa Oeste">Villa Oeste</option>
+                      
                     </select>
                   </div>
                   <div className="d-flex gap-2">

@@ -8,6 +8,9 @@ const categorias = [
   { value: 'limpieza', label: 'Limpieza' },
   { value: 'bebidas', label: 'Bebidas' },
   { value: 'panaderia', label: 'Panadería' },
+  { value: 'otros', label: 'Otros' },
+  { value: 'salud', label: 'Salud y Cuidado Personal' },
+  { value: 'snacks', label: 'Snacks y Dulces' },
 ];
 
 const ordenes = [
@@ -36,7 +39,7 @@ const Producto = () => {
           id: 1,
           nombre: 'Arroz Integral',
           precio: 1290,
-          imagen: 'arroz.jpg',
+          imagen: 'https://th.bing.com/th/id/R.4b9c664985f7327c573b54ba819ef489?rik=tI99qU8y0Ut%2bnw&pid=ImgRaw&r=0',
           descripcion: 'Arroz integral 1kg, marca Villa Markets',
           categoria: 'abarrotes',
           stock: 15,
@@ -51,7 +54,7 @@ const Producto = () => {
           id: 1,
           nombre: 'Arroz Integral',
           precio: 1290,
-          imagen: 'arroz.jpg',
+          imagen: 'https://th.bing.com/th/id/R.4b9c664985f7327c573b54ba819ef489?rik=tI99qU8y0Ut%2bnw&pid=ImgRaw&r=0',
           descripcion: 'Arroz integral 1kg, marca Villa Markets',
           categoria: 'abarrotes',
           stock: 15,
@@ -294,7 +297,7 @@ const Producto = () => {
                 {prod.stock === 0 && <span className="badge bg-danger badge-stock position-absolute top-0 end-0 m-2">Agotado</span>}
                 {prod.stock <= 5 && prod.stock > 0 && <span className="badge bg-warning text-dark badge-stock position-absolute top-0 end-0 m-2">Últimas unidades</span>}
                 <img
-                  src={prod.imagen ? `/images/${prod.imagen}` : '/images/default.jpg'}
+                  src={prod.imagen ? (prod.imagen.startsWith('http') ? prod.imagen : `/images/productos/${prod.imagen}`) : '/images/default.jpg'}
                   className="card-img-top"
                   alt={prod.nombre}
                   style={{ height: 180, objectFit: 'contain', padding: '1rem' }}
