@@ -1,6 +1,8 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/layout/Navbar.jsx";
 import NavbarAdmin from "./components/layout/NavbarAdmin.jsx";
+import NavbarCliente from "./components/layout/NavbarCliente.jsx";
+import './utils/fontawesome';
 import Footer from "./components/layout/Footer.jsx";
 
 import Home from "./pages/public/Home.jsx";
@@ -38,7 +40,9 @@ function App() {
   
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
-      {isAdminRoute ? <NavbarAdmin /> : !isClientRoute && <Navbar /> }
+      {isAdminRoute ? <NavbarAdmin /> : 
+       isClientRoute ? <NavbarCliente /> :
+       <Navbar />}
 
       <main className="flex-grow-1">
 
@@ -67,10 +71,10 @@ function App() {
           <Route path="/clienteinicio/mis-pedidos" element={<MisPedidos />} />
           <Route path="/clienteinicio/micarrito" element={<Carrito />} />
           <Route path="/clienteinicio/producto" element={<Producto />} />
+          <Route path="/clienteinicio/minimarket" element={<Minimarket />} />
 
-
-          <Route path="/Minimarket" element={<Minimarket />} />
-          <Route path="/perfil" element={<PerfilUsuario />} />
+          {/* Rutas públicas */}
+          <Route path="/minimarket" element={<Minimarket />} />
           <Route path="/productos" element={<ProductosGlobal />} />
           <Route path="/soporte" element={<Soporte />} />
           <Route path="/pedidos" element={<Pedidos />} />

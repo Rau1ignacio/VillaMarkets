@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import './Perfil.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faEnvelope, faCamera, faLink, faUpload, faSave, faSignOutAlt, faStore } from '@fortawesome/free-solid-svg-icons';
 
 export default function Perfil() {
     // Carga perfil desde localStorage (clave existente: 'usuarioActual')
@@ -28,7 +30,7 @@ export default function Perfil() {
 
     const handleLogout = () => {
         localStorage.removeItem('usuarioActual');
-        window.location.href = '/login';
+        window.location.href = '/clienteinicio';
     };
 
     const validarUrl = (url) => {
@@ -89,28 +91,44 @@ export default function Perfil() {
     };
 
     return (
-        <div style={{ maxWidth: 560, margin: '24px auto' }}>
-            <div style={{ textAlign: 'center' }}>
-                <img
-                    src={avatarSrc}
-                    alt="avatar"
-                    style={{ borderRadius: '50%', width: 120, height: 120, objectFit: 'cover', border: '3px solid #e9ecef' }}
-                />
-                <h2 style={{ marginTop: 12 }}>{nombre}</h2>
-                <p className="text-muted">{email || 'Sin correo'}</p>
+        <div className="profile-container">
+            <div className="profile-header">
+                <div className="avatar-container">
+                    <img
+                        src={avatarSrc}
+                        alt="avatar"
+                        className="profile-avatar"
+                    />
+                </div>
+                <h1 className="profile-name">{nombre}</h1>
+                <p className="profile-email">
+                    <FontAwesomeIcon icon={faEnvelope} className="me-2" />
+                    {email || 'Sin correo'}
+                </p>
             </div>
 
             {feedback && (
                 <div className={`alert ${feedback.type === 'success' ? 'alert-success' : 'alert-danger'}`} role="alert">
+                    <FontAwesomeIcon 
+                        icon={feedback.type === 'success' ? faSave : faCamera} 
+                        className="me-2" 
+                    />
                     {feedback.msg}
                 </div>
             )}
 
-            <div className="card" style={{ marginTop: 16 }}>
+            <div className="profile-card card">
                 <div className="card-body">
-                    <h5 className="card-title">Editar perfil</h5>
-                    <div className="mb-3">
-                        <label className="form-label">Nombre</label>
+                    <h5 className="card-title">
+                        <FontAwesomeIcon icon={faUser} className="me-2" />
+                        Editar perfil
+                    </h5>
+                    
+                    <div className="mb-4">
+                        <label className="form-label">
+                            <FontAwesomeIcon icon={faUser} className="me-2" />
+                            Nombre
+                        </label>
                         <input
                             type="text"
                             className="form-control"
@@ -120,14 +138,18 @@ export default function Perfil() {
                         />
                     </div>
 
-                    <div className="mb-2">
-                        <label className="form-label">Cambiar foto de perfil</label>
-                        <div className="btn-group mb-2" role="group" aria-label="Método de foto">
+                    <div className="mb-4">
+                        <label className="form-label">
+                            <FontAwesomeIcon icon={faCamera} className="me-2" />
+                            Cambiar foto de perfil
+                        </label>
+                        <div className="btn-group" role="group" aria-label="Método de foto">
                             <button
                                 type="button"
                                 className={`btn ${metodoFoto === 'url' ? 'btn-primary' : 'btn-outline-primary'}`}
                                 onClick={() => setMetodoFoto('url')}
                             >
+                                <FontAwesomeIcon icon={faLink} className="me-2" />
                                 Usar URL
                             </button>
                             <button
@@ -135,12 +157,13 @@ export default function Perfil() {
                                 className={`btn ${metodoFoto === 'file' ? 'btn-primary' : 'btn-outline-primary'}`}
                                 onClick={() => setMetodoFoto('file')}
                             >
+                                <FontAwesomeIcon icon={faUpload} className="me-2" />
                                 Subir archivo
                             </button>
                         </div>
 
                         {metodoFoto === 'url' ? (
-                            <div className="input-group">
+                            <div className="input-group mt-3">
                                 <input
                                     type="url"
                                     className="form-control"
@@ -148,42 +171,51 @@ export default function Perfil() {
                                     value={fotoUrl}
                                     onChange={(e) => setFotoUrl(e.target.value)}
                                 />
-                                <button className="btn btn-outline-secondary" type="button" onClick={aplicarUrl}>
+                                <button className="btn btn-outline-primary" type="button" onClick={aplicarUrl}>
+                                    <FontAwesomeIcon icon={faLink} className="me-2" />
                                     Aplicar URL
                                 </button>
                             </div>
                         ) : (
-                            <input
-                                type="file"
-                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                className="form-control"
-                                onChange={onFileChange}
-                            />
+                            <div className="mt-3">
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                    className="form-control"
+                                    onChange={onFileChange}
+                                />
+                            </div>
                         )}
                     </div>
 
-                    <div className="d-flex justify-content-between mt-3">
-                        <div>
-                            <button className="btn btn-light" style={{ marginRight: 8 }} disabled>
-                                Mi perfil
-                            </button>
+                    <div className="profile-actions">
+                        <div className="d-flex gap-2">
                             <button className="btn btn-outline-danger" onClick={handleLogout}>
+                                <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
                                 Cerrar sesión
                             </button>
                         </div>
                         <button className="btn btn-success" onClick={guardarCambios}>
+                            <FontAwesomeIcon icon={faSave} className="me-2" />
                             Guardar cambios
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16 }}>
-                <Link to="/minimarkets">
-                    <button className="btn btn-outline-primary">Ver Tiendas</button>
+            <div className="navigation-buttons">
+                <Link to="/clienteinicio/minimarket">
+                    <button className="btn btn-outline-primary">
+                        <FontAwesomeIcon icon={faStore} className="me-2" />
+                        Ver Tiendas
+                    </button>
                 </Link>
-                
-                
+                <Link to="/clienteinicio">
+                    <button className="btn btn-outline-secondary">
+                        <FontAwesomeIcon icon={faUser} className="me-2" />
+                        Volver al Inicio
+                    </button>
+                </Link>
             </div>
         </div>
     );

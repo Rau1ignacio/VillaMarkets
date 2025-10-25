@@ -1,9 +1,24 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import logo from "../../images/Logos/Logotipo Transparente.png";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function NavbarAdmin() {
   const navigate = useNavigate();
+  const [isNavCollapsed, setIsNavCollapsed] = useState(true);
+
+  const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
+
+  // Cerrar el menú cuando se hace clic en un enlace
+  useEffect(() => {
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        setIsNavCollapsed(true);
+      });
+    });
+  }, []);
 
   // Obtener información del admin desde localStorage
   const getAdminInfo = () => {
@@ -38,16 +53,15 @@ export default function NavbarAdmin() {
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#menuAdmin"
-          aria-controls="menuAdmin"
-          aria-expanded="false"
+          onClick={handleNavCollapse}
+          aria-controls="navCliente"
+          aria-expanded={!isNavCollapsed}
           aria-label="Toggle navigation"
         >
-          <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon" />
         </button>
 
-        <div className="collapse navbar-collapse" id="menuAdmin">
+        <div className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`} id="navCliente">
           {/* Links principales */}
           <ul className="navbar-nav me-auto">
 
@@ -69,6 +83,7 @@ export default function NavbarAdmin() {
                 <i className="fas fa-users me-2"></i>Gestion Usuarios
               </NavLink>
             </li>
+            
             <li className="nav-item">
               <NavLink className="nav-link" to="/admin/Tiendas">
                 <i className="fas fa-store me-2"></i>Minimarkets
