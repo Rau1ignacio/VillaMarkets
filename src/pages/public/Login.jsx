@@ -67,9 +67,12 @@ export default function Login() {
       if (user.tipoUsuario === "admin" || user.rol === "admin") {
         console.log("Redirigiendo a /admin");
         navigate("/admin", { replace: true });
+      } else if (user.tipoUsuario === "cliente" || user.rol === "cliente") {
+        console.log("Redirigiendo a /clienteinicio");
+        navigate("/clienteinicio", { replace: true });
       } else {
-        console.log("Redirigiendo a /perfil");
-        navigate("/perfil", { replace: true });
+        console.log("Rol no reconocido, redirigiendo a /");
+        navigate("/", { replace: true });
       }
     }, 500); // micro delay para animación
   };

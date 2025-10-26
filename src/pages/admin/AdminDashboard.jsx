@@ -15,7 +15,7 @@ const AdminDashboard = () => {
     });
 
     const [actividadReciente] = useState([
-        { tipo: 'venta', mensaje: 'Nuevo pedido rgba(0, 0, 0, 0.27) - CLP $85.50', tiempo: '5 min', icono: 'shopping-bag', color: 'success' },
+        { tipo: 'venta', mensaje: 'Nuevo pedido | Pan - CLP $3.000', tiempo: '5 min', icono: 'shopping-bag', color: 'success' },
         { tipo: 'usuario', mensaje: 'Cliente nuevo registrado: María L.', tiempo: '15 min', icono: 'user-plus', color: 'info' },
         { tipo: 'producto', mensaje: 'Producto actualizado: Leche Gloria', tiempo: '1 hora', icono: 'edit', color: 'warning' },
         { tipo: 'sistema', mensaje: 'Backup del sistema completado', tiempo: '2 horas', icono: 'server', color: 'primary' }

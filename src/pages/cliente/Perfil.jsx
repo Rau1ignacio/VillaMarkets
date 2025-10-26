@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Perfil.css';
+import '../../styles/Perfil.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faCamera, faLink, faUpload, faSave, faSignOutAlt, faStore } from '@fortawesome/free-solid-svg-icons';
 

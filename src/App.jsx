@@ -6,7 +6,6 @@ import './utils/fontawesome';
 import Footer from "./components/layout/Footer.jsx";
 
 import Home from "./pages/public/Home.jsx";
-//import Carrito from "./pages/public/Carrito.jsx";
 import Login from "./pages/public/Login.jsx";
 import Registro from "./pages/public/Registro.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -18,7 +17,7 @@ import Configuracion from "./pages/admin/Configuracion.jsx";
 import Tiendas from "./pages/admin/Tiendas.jsx";
 
 
-import Clienteinicio from "./pages/cliente/Clienteinicio.jsx";
+import Clienteinicio from "./pages/cliente/ClienteInicio.jsx";
 
 import Perfil from "./pages/cliente/Perfil.jsx";
 import Ofertas from "./pages/cliente/ofertas.jsx";
@@ -27,7 +26,6 @@ import Carrito from "./pages/cliente/MiCarrito.jsx";
 import Producto from "./pages/cliente/Producto.jsx";
 
 import Minimarket from "./pages/public/Minimarket.jsx";
-import PerfilUsuario from "./pages/public/PerfilUsuario.jsx";
 import ProductosGlobal from "./pages/public/ProductosGlobal.jsx";
 import Soporte from "./pages/public/Soporte.jsx";
 import Pedidos from "./pages/public/Pedidos.jsx";

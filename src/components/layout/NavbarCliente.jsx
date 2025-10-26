@@ -61,7 +61,7 @@ export default function NavbarCliente({
             </li>
 
             <li className="nav-item">
-              <NavLink className="nav-link" to="/Minimarket">
+              <NavLink className="nav-link" to="/clienteinicio/minimarket">
                 <i className="fas fa-store me-1"></i>
                 Minimarket
               </NavLink>

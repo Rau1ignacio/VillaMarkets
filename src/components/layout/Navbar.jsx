@@ -51,37 +51,28 @@ export default function Navbar({
         <div className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`} id="navCliente">
 
           <ul id="menu-opciones" className="navbar-nav ms-auto">
+
             <li className="nav-item">
               <NavLink className="nav-link" to="/">Inicio</NavLink>
             </li>
             <li className="nav-item">
               <NavLink className="nav-link" to="/minimarket">Minimarkets</NavLink>
             </li>
+
+            {/* Este catalogo no esta conectado con el /productos de cliente. || solo es de
+            muestra. porque debe haber un cliente conectado para hacer pedido y ver el catalogo real*/}
             <li className="nav-item">
               <NavLink className="nav-link" to="/productos">Catálogo</NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink
-                className="nav-link position-relative"
-                to="/carrito"
-                aria-label="Carrito"
-              >
-                <i className="fas fa-shopping-cart" />
-                <span
-                  id="cart-count"
-                  className="badge rounded-pill bg-danger cart-badge"
-                  style={{ marginLeft: 6 }}
-                >
-                  {cartCount}
-                </span>
-              </NavLink>
-            </li>
+    
             <li className="nav-item">
               <NavLink className="nav-link" to="/login">Iniciar sesión</NavLink>
             </li>
+
             <li className="nav-item">
               <NavLink className="nav-link" to="/registro">Registrarse</NavLink>
             </li>
+
           </ul>
         </div>
       </div>
