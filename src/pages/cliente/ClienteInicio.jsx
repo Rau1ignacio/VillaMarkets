@@ -12,7 +12,7 @@ const OFERTAS_DESTACADAS = [
     color: "danger"
   },
   {
-    titulo: "25% off en L├ícteos",
+    titulo: "25% off en Lacteos",
     tienda: "Minimarket Las Condes",
     etiqueta: "DESTACADO",
     color: "success"
