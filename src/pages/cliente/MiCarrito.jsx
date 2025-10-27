@@ -23,7 +23,7 @@ const MiCarrito = () => {
   const [mensaje, setMensaje] = useState('');
   const [confirmado, setConfirmado] = useState(false);
   const navigate = useNavigate();
-  /// useEffect para cargar el carrito desde localStorage
+  
   useEffect(() => {
     const carritoGuardado = JSON.parse(localStorage.getItem('carrito')) || [];
     setCarrito(carritoGuardado);

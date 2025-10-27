@@ -43,7 +43,7 @@ const MetodoPago = ({ total, onConfirmar }) => {
         <input type="file" className="form-control" onChange={e => setComprobante(e.target.files[0])} />
       </div>
       <div className="mb-3">
-        <b>Total a pagar: S/ {total}</b>
+        <b>Total a pagar: CLP ${total}</b>
       </div>
       <button type="submit" className="btn btn-success">Confirmar Pago</button>
     </form>
