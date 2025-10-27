@@ -26,7 +26,7 @@ export default function Footer({
             <h5 className="fw-bold">Enlaces rápidos</h5>
             <ul className="list-unstyled mb-0">
               <li>
-                <NavLink className="text-white text-decoration-none" to="/miniMarkets">
+                <NavLink className="text-white text-decoration-none" to="/Minimarket">
                   <i className="fas fa-store me-2" />
                   Minimarkets
                 </NavLink>
@@ -38,7 +38,7 @@ export default function Footer({
                 </NavLink>
               </li>
               <li>
-                <NavLink className="text-white text-decoration-none" to="/soporte">
+                <NavLink className="text-white text-decoration-none" to="/Soporte">
                   <i className="fas fa-headset me-2" />
                   Soporte
                 </NavLink>
