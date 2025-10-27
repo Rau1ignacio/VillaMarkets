@@ -1,22 +1,10 @@
 import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-// import '../../styles/ClienteInicio.css'; // Se elimina la importación del archivo local
-
-/*
- * --- NOTA ---
- * Este componente AHORA SÍ usa 'react-router-dom'
- * y también carga las CDNs de Bootstrap y Font Awesome
- * para que el diseño que te gustó funcione correctamente.
- *
- * Los estilos personalizados se añaden en una etiqueta <style>
- * para que el componente sea autocontenido.
- */
-
+import '../../styles/ClienteInicio.css';
 
 // --- Datos Constantes ---
-// Mover datos estáticos fuera del componente evita que se redeclaren en cada render.
 const OFERTAS_DESTACADAS = [
-// ... (código de ofertas sin cambios) ...
+// De momento no hemos puesto ofertas verdaderas
   {
     titulo: "2x1 en Frutas y Verduras",
     tienda: "Minimarket El Barrio",
@@ -24,7 +12,7 @@ const OFERTAS_DESTACADAS = [
     color: "danger"
   },
   {
-    titulo: "25% off en Lácteos",
+    titulo: "25% off en L├ícteos",
     tienda: "Minimarket Las Condes",
     etiqueta: "DESTACADO",
     color: "success"
@@ -38,7 +26,7 @@ const OFERTAS_DESTACADAS = [
 ];
 
 const ESTADISTICAS_USUARIO = [
-// ... (código de estadísticas sin cambios) ...
+// De momento no hemos puesto estadisticas verdaderas
   {
     titulo: "Compras Realizadas",
     valor: "12",
@@ -60,10 +48,10 @@ const ESTADISTICAS_USUARIO = [
 ];
 
 const ACCESOS_RAPIDOS = [
-// ... (código de accesos rápidos sin cambios) ...
+// De momento no hemos puesto estadisticas verdaderas
   {
     titulo: "Productos",
-    descripcion: "Explora nuestro catálogo completo",
+    descripcion: "Explora nuestro cat├ílogo completo",
     icono: "fas fa-shopping-bag",
     handlerName: "productos"
   },
@@ -88,21 +76,17 @@ const ACCESOS_RAPIDOS = [
 ];
 
 
-/**
- * Componente de Hoja de Estilos
- * Inserta las CDNs de Bootstrap y Font Awesome.
- * Los estilos personalizados ahora se cargarán desde ClienteInicio.css
- */
+/* Componente de Hoja de Estilos */
 const CustomStyles = () => (
   <Fragment>
-    {/* CDN de Bootstrap (CORREGIDO) */}
+    
     <link 
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
       rel="stylesheet" 
       xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
       crossOrigin="anonymous" 
     />
-    {/* CDN de Font Awesome (CORREGIDO - necesario para los íconos) */}
+    
     <link 
       rel="stylesheet" 
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
@@ -110,141 +94,25 @@ const CustomStyles = () => (
       crossOrigin="anonymous" 
       referrerPolicy="no-referrer" 
     />
-    
-    {/* Añadimos los estilos personalizados aquí */}
-    <style>{`
-      /* --- Estilos Globales (de global.css) --- */
-      body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background-color: #f8f9fa; /* Un fondo gris muy claro */
-        color: #333;
-      }
-      
-      .section-title {
-        font-weight: 700;
-        color: #212529;
-        margin-bottom: 1.5rem;
-        text-align: center;
-      }
-
-      /* --- Estilos del Componente (de ClienteInicio.css) --- */
-      .cliente-inicio {
-        padding-bottom: 3rem;
-      }
-
-      .welcome-banner {
-        background: linear-gradient(135deg, var(--bs-success-bg-subtle), var(--bs-light));
-        border-bottom: 1px solid var(--bs-border-color);
-      }
-      
-      .welcome-illustration {
-        max-width: 350px;
-        height: auto;
-        border-radius: 1rem;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        object-fit: cover;
-      }
-
-      .quick-access-card {
-        background-color: #ffffff;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        text-align: center;
-        border: 1px solid var(--bs-border-color-translucent);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        cursor: pointer;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .quick-access-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-      }
-
-      .quick-access-card i {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--bs-success);
-      }
-
-      .quick-access-card h3 {
-        font-weight: 600;
-        font-size: 1.25rem;
-        margin-bottom: 0.25rem;
-        color: #343a40;
-      }
-
-      .quick-access-card p {
-        font-size: 0.9rem;
-        color: #6c757d;
-        margin-bottom: 0;
-      }
-
-      .stat-card, .offer-card {
-        background-color: #ffffff;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        border: 1px solid var(--bs-border-color-translucent);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        height: 100%;
-      }
-      
-      .stat-icon {
-        font-size: 1.75rem;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-
-      /* Colores de íconos de estadísticas */
-      .stat-icon.bg-success-subtle { color: var(--bs-success); }
-      .stat-icon.bg-info-subtle { color: var(--bs-info); }
-      .stat-icon.bg-warning-subtle { color: var(--bs-warning); }
-      .stat-icon.bg-danger-subtle { color: var(--bs-danger); }
-
-      .stat-info h4, .offer-card h4 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-      }
-      
-      .stat-info .stat-value {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #212529;
-        margin-bottom: 0;
-      }
-    `}</style>
+    {/* Añadimos los estilos personalizados aqui */}
   </Fragment>
 );
 
 // --- Componente Principal ---
 const ClienteInicio = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Añadido para tu lógica de useEffect
+  const location = useLocation(); 
   
   // Usar useState para el usuario.
   const [usuario, setUsuario] = useState(null);
 
-  // --- Lógica del Usuario (de tu código original) ---
+  // --- L├│gica del Usuario (de tu c├│digo original) ---
   useEffect(() => {
         if (location?.state?.openNearest) {
-            // esperar que mapa esté inicializado
+            // esperar que mapa estainicializado
              const t = setTimeout(() => {
               console.log("Buscando minimarket cercano (simulado)...");
-             // encontrarCercano(); // Asegúrate de definir esta función si la necesitas
+              encontrarCercano(); 
             }, 500);
             return () => clearTimeout(t);
     }
@@ -258,35 +126,34 @@ const ClienteInicio = () => {
       setUsuario(usuarioGuardado ? JSON.parse(usuarioGuardado) : {});
     } catch (error) {
       console.error("Error al parsear datos del usuario:", error);
-      setUsuario({}); // Establecer un objeto vacío en caso de error
+      setUsuario({}); // Establecer un objeto vacio en caso de error
     }
-  }, []); // El array vacío [] asegura que esto se ejecute solo una vez
+  }, []); 
 
-  // --- Manejadores de Navegación (con tus rutas) ---
+  // --- Manejadores de Navegacion (con tus rutas) ---
   
   const handleLogout = useCallback(() => {
-     localStorage.removeItem('usuario'); // Tu lógica
-     navigate('/login'); // Tu ruta
+     localStorage.removeItem('usuario'); // Tu l├│gica
+     navigate('/login'); 
   }, [navigate]);
 
   const handleMinimarket = useCallback(() => {
-      // Tu lógica y ruta
         navigate('./Minimarket', { state: { openNearest: true } }); 
   }, [navigate]);
 
   const handlePerfil = useCallback(() => {
-        navigate('./Perfil'); // Tu ruta
+        navigate('./Perfil'); 
   }, [navigate]);
 
   const handleMiCarrito = useCallback(() => {
-        navigate('./micarrito'); // Tu ruta
+        navigate('./micarrito'); 
   }, [navigate]);
 
   const handleProductos = useCallback(() => {
-        navigate('./producto'); // Tu ruta
+        navigate('./producto'); 
   }, [navigate]);
 
-  // Mapear los handlers a un objeto para un acceso más limpio
+  // Mapear los handlers a un objeto para un acceso m├ís limpio
   const navigationHandlers = {
     productos: handleProductos,
     minimarket: handleMinimarket,
@@ -305,7 +172,7 @@ const ClienteInicio = () => {
     );
   }
 
-  // --- Renderizado del Componente (El diseño que te gustó) ---
+  // Html ---------------------------------------------------------------------------------------------------------------------------
   return (
     <Fragment>
       {/* Inserta los estilos y CDNs */}
@@ -318,7 +185,7 @@ const ClienteInicio = () => {
             <div className="row align-items-center">
               <div className="col-lg-7">
                 <h1 className="display-4 fw-bold mb-3">
-                  ¡Hola, {usuario?.nombre || 'Cliente'}! 👋
+                  Hola, {usuario?.nombre || 'Cliente'}!
                 </h1>
                 <p className="lead mb-4">
                   Descubre las mejores ofertas y productos locales
@@ -348,15 +215,15 @@ const ClienteInicio = () => {
         </section>
 
         <div className="container py-5">
-          {/* Accesos Rápidos */}
+          {/* Accesos Rapidos */}
           <div className="row g-4 mb-5">
             {ACCESOS_RAPIDOS.map((item) => (
               <div key={item.handlerName} className="col-6 col-md-3">
                 <div 
                   className="quick-access-card" 
                   onClick={navigationHandlers[item.handlerName]}
-                  role="button" // Añadido por accesibilidad
-                  tabIndex={0}  // Añadido por accesibilidad
+                  role="button" 
+                  tabIndex={0}  
                   onKeyPress={(e) => e.key === 'Enter' && navigationHandlers[item.handlerName]()}
                 >
                   <i className={item.icono}></i>
@@ -367,7 +234,7 @@ const ClienteInicio = () => {
             ))}
           </div>
 
-          {/* Estadísticas del Usuario */}
+          {/* Estadisticas del Usuario */}
           <section>
             <h2 className="section-title mb-4">Tu Actividad</h2>
             <div className="row g-4">
@@ -387,7 +254,7 @@ const ClienteInicio = () => {
             </div>
           </section>
 
-          {/* Ofertas del Día */}
+          {/* Ofertas del Dia */}
           <section className="mt-5 pt-4 border-top">
             <h2 className="section-title">Ofertas Destacadas</h2>
             <div className="row g-4">
@@ -425,5 +292,6 @@ const ClienteInicio = () => {
 };
 
 export default ClienteInicio;
+
 
 
