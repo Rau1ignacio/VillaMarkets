@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const categorias = [
   { value: 'todos', label: 'Todas las categorías' },
@@ -27,6 +27,8 @@ const Producto = () => {
   const [orden, setOrden] = useState('nombre');
   const [stockFiltro, setStockFiltro] = useState('todos');
   const [busqueda, setBusqueda] = useState('');
+  const [productoAnimado, setProductoAnimado] = useState(null);
+  const animacionTimeoutRef = useRef(null);
 
   useEffect(() => {
     // Leer productos desde localStorage, si no existen usar los hardcodeados
@@ -201,11 +203,24 @@ const Producto = () => {
       localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
       return nuevoCarrito;
     });
+    setProductoAnimado(producto.id);
+    if (animacionTimeoutRef.current) clearTimeout(animacionTimeoutRef.current);
+    animacionTimeoutRef.current = setTimeout(() => {
+      setProductoAnimado(null);
+    }, 500);
   };
 
   useEffect(() => {
     // El almacenamiento en localStorage ahora se realiza directamente en agregarAlCarrito
   }, [carrito]);
+
+  useEffect(() => {
+    return () => {
+      if (animacionTimeoutRef.current) {
+        clearTimeout(animacionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Filtros y orden
   const filtrarProductos = () => {
@@ -293,16 +308,24 @@ const Producto = () => {
         ) : (
           productosAMostrar.map(prod => (
             <div className="col-md-4 col-lg-3 mb-4" key={prod.id}>
-              <div className="card product-card h-100 position-relative">
+              <div
+                className="card product-card h-100 position-relative"
+                style={{
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  transform: productoAnimado === prod.id ? 'scale(1.02)' : 'scale(1)',
+                  boxShadow: productoAnimado === prod.id ? '0 12px 30px rgba(0, 0, 0, 0.15)' : undefined
+                }}
+              >
                 {prod.stock === 0 && <span className="badge bg-danger badge-stock position-absolute top-0 end-0 m-2">Agotado</span>}
                 {prod.stock <= 5 && prod.stock > 0 && <span className="badge bg-warning text-dark badge-stock position-absolute top-0 end-0 m-2">Últimas unidades</span>}
-                <img
-                  src={prod.imagen ? (prod.imagen.startsWith('http') ? prod.imagen : `/images/productos/${prod.imagen}`) : '/images/default.jpg'}
-                  className="card-img-top"
-                  alt={prod.nombre}
-                  style={{ height: 180, objectFit: 'contain', padding: '1rem' }}
-                  onError={e => { e.target.src = '/images/default.jpg'; }}
-                />
+                <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backgroundColor: '#fff' }}>
+                  <img
+                    src={prod.imagen ? (prod.imagen.startsWith('http') ? prod.imagen : `/images/productos/${prod.imagen}`) : '/images/default.jpg'}
+                    alt={prod.nombre}
+                    style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
+                    onError={e => { e.target.src = '/images/default.jpg'; }}
+                  />
+                </div>
                 <div className="card-body">
                   <h5 className="card-title">{prod.nombre}</h5>
                   <p className="card-text text-muted small">{prod.descripcion}</p>
@@ -310,7 +333,7 @@ const Producto = () => {
                     <i className="fas fa-store-alt me-1"></i> {prod.minimarket || 'Todos los minimarkets'}
                   </p>
                   <div className="d-flex justify-content-between align-items-center">
-                    <span className="fw-bold text-green">S/ {prod.precio.toLocaleString('es-CL')}</span>
+                    <span className="fw-bold text-green">CLP ${prod.precio.toLocaleString('es-CL')}</span>
                     <button
                       className="btn btn-green btn-sm"
                       disabled={prod.stock === 0}

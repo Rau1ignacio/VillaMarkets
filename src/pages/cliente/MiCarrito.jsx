@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const ENVIO_COSTO = 2990;
 const IVA_PORCENTAJE = 0.19;
+const formatearCLP = (valor) => 'CLP ' + new Intl.NumberFormat('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Math.round(valor));
 
 
 // Componente principal del carrito de compras
@@ -59,20 +60,36 @@ const MiCarrito = () => {
   };
 
   const handleConfirmarPago = async (datosPago) => {
-    await descontarStock();
+    const productosComprados = carrito.map(prod => ({ ...prod }));
+    const subtotal = calcularSubtotal();
+    const ivaCalculado = calcularIVA(subtotal);
+    const envioCalculado = calcularEnvio();
+    const totalCalculado = subtotal + ivaCalculado + envioCalculado - descuento;
+
+    let estadoPedido = 'Procesando';
+    let mensajeUsuario = '¡Compra realizada y stock actualizado!';
+
+    try {
+      await descontarStock();
+    } catch (error) {
+      console.error('Error al descontar stock remoto:', error);
+      estadoPedido = 'Pendiente de confirmación';
+      mensajeUsuario = 'No se pudo actualizar el stock remoto, pero tu pedido quedó guardado en el historial.';
+    }
+
     const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
     const ahora = new Date();
     const nuevoPedido = {
       fecha: ahora.toLocaleDateString(),
       hora: ahora.toLocaleTimeString(),
-      total: calcularTotal(),
-      estado: 'Procesando',
+      total: totalCalculado,
+      estado: estadoPedido,
       metodoPago: 'Pago en línea',
       direccion: '',
       descuento,
-      envio: calcularEnvio(),
-      iva: calcularIVA(calcularSubtotal()),
-      productos: carrito,
+      envio: envioCalculado,
+      iva: ivaCalculado,
+      productos: productosComprados,
       nombreCliente: datosPago.nombre || '',
       datosPago
     };
@@ -80,7 +97,7 @@ const MiCarrito = () => {
     localStorage.setItem('misPedidos', JSON.stringify(pedidosGuardados));
     setCarrito([]);
     localStorage.removeItem('carrito');
-    setMensaje('¡Compra realizada y stock actualizado!');
+    setMensaje(mensajeUsuario);
     setDescuento(0);
     setEnvioGratis(false);
     setConfirmado(true);
@@ -167,8 +184,8 @@ const MiCarrito = () => {
                       onChange={e => modificarCantidad(prod.id, parseInt(e.target.value))}
                     />
                   </td>
-                  <td>S/ {prod.precio}</td>
-                  <td>S/ {prod.precio * prod.cantidad}</td>
+                  <td>{formatearCLP(prod.precio)}</td>
+                  <td>{formatearCLP(prod.precio * prod.cantidad)}</td>
                   <td>
                     <button className="btn btn-danger btn-sm" onClick={() => eliminarProducto(prod.id)}>
                       <i className="fas fa-trash"></i>
@@ -182,24 +199,24 @@ const MiCarrito = () => {
             <h4>Resumen</h4>
             <div className="d-flex justify-content-between">
               <span>Subtotal:</span>
-              <span>S/ {calcularSubtotal()}</span>
+              <span>{formatearCLP(calcularSubtotal())}</span>
             </div>
             <div className="d-flex justify-content-between">
               <span>IVA (19%):</span>
-              <span>S/ {calcularIVA(calcularSubtotal()).toFixed(2)}</span>
+              <span>{formatearCLP(calcularIVA(calcularSubtotal()))}</span>
             </div>
             <div className="d-flex justify-content-between">
               <span>Envío:</span>
-              <span>{envioGratis ? 'Gratis' : `S/ ${ENVIO_COSTO}`}</span>
+              <span>{envioGratis ? 'Gratis' : formatearCLP(ENVIO_COSTO)}</span>
             </div>
             <div className="d-flex justify-content-between text-danger">
               <span>Descuentos:</span>
-              <span>-S/ {descuento.toFixed(2)}</span>
+              <span>-{formatearCLP(descuento)}</span>
             </div>
             <hr />
             <div className="d-flex justify-content-between fw-bold">
               <span>Total:</span>
-              <span className="text-green">S/ {calcularTotal().toFixed(2)}</span>
+              <span className="text-green">{formatearCLP(calcularTotal())}</span>
             </div>
             {/* Campo de descuento eliminado */}
           </div>

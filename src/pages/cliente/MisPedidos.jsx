@@ -9,6 +9,7 @@ const MisPedidos = () => {
     setPedidos(pedidosGuardados.reverse()); // Mostrar el más reciente primero
   }, []);
 
+  // HTML ---------------------------------------------------------------------------------------
   return (
     <div className="container py-4">
       <h2>Historial de Compras</h2>
@@ -16,14 +17,6 @@ const MisPedidos = () => {
         <p>No tienes compras registradas.</p>
       ) : (
         <>
-          <div className="mb-3">
-            <Link to="/cliente/producto" className="btn btn-green me-2">
-              Seguir comprando
-            </Link>
-            <Link to="/cliente/micarrito" className="btn btn-secondary">
-              Ir al carrito
-            </Link>
-          </div>
           <table className="table table-bordered table-striped mt-3">
             <thead>
               <tr>

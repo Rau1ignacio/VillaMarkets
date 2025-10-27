@@ -75,13 +75,6 @@ export default function NavbarCliente({
             </li>
 
             <li className="nav-item">
-              <NavLink className="nav-link" to="/clienteinicio/ofertas">
-                <i className="fas fa-tag me-1"></i>
-                Ofertas
-              </NavLink>
-            </li>
-
-            <li className="nav-item">
               <NavLink className="nav-link" to="/clienteinicio/mis-pedidos">
                 <i className="fas fa-box me-1"></i>
                 Mis Pedidos
