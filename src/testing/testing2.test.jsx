@@ -1,10 +1,8 @@
-import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Tiendas from '../pages/admin/Tiendas.jsx';
 import '@testing-library/jest-dom';
-// 
-// eslint-disable-next-line no-undef
+
 describe('Gestión de Tiendas', () => {
 
   // eslint-disable-next-line no-undef
@@ -24,8 +22,9 @@ describe('Gestión de Tiendas', () => {
   it('agrega una tienda y la muestra en la lista', () => {
     window.localStorage.setItem('vm_stores', JSON.stringify([]));
     render(<Tiendas />);
-    fireEvent.change(screen.getByPlaceholderText(/nombre del minimarket/i), { target: { value: 'Tienda Prueba' } });
-    fireEvent.change(screen.getByPlaceholderText(/dirección/i), { target: { value: 'Calle Falsa 123' } });
+    // Los inputs usan placeholders como ejemplo (Ej: Villa Market Central, Ej: Av. Principal #123)
+    fireEvent.change(screen.getByPlaceholderText(/Ej:\s*Villa Market Central/i), { target: { value: 'Tienda Prueba' } });
+    fireEvent.change(screen.getByPlaceholderText(/Ej:\s*Av\. Principal/i), { target: { value: 'Calle Falsa 123' } });
     fireEvent.click(screen.getByText(/agregar tienda/i));
   // eslint-disable-next-line no-undef
   expect(screen.getByText(/tienda prueba/i)).toBeInTheDocument();
@@ -40,14 +39,17 @@ describe('Gestión de Tiendas', () => {
     window.localStorage.setItem('vm_stores', JSON.stringify([
       { id: 1, name: 'Tienda Prueba', address: 'Calle Falsa 123' }
     ]));
-    render(<Tiendas />);
+  const { container } = render(<Tiendas />);
 
-    // Simula click en el botón eliminar
-    fireEvent.click(screen.getByText(/eliminar/i));
+  // Forzar confirmación afirmativa (jsdom/jest no muestra el diálogo)
+  window.confirm = jest.fn(() => true);
+
+  // Buscar el botón de eliminar por el atributo title (existe en el componente)
+  const btnEliminar = container.querySelector('button[title="Eliminar tienda"]');
+  expect(btnEliminar).toBeInTheDocument();
+  fireEvent.click(btnEliminar);
 
     // Verifica que el mensaje de lista vacía aparece
-    
-  // eslint-disable-next-line no-undef
-  expect(screen.getByText(/no hay tiendas registradas/i)).toBeInTheDocument();
+    expect(screen.getByText(/no hay tiendas registradas/i)).toBeInTheDocument();
   });
 });
