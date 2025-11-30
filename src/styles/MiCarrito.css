@@ -1,0 +1,26 @@
+.mi-carrito-product-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 6px;
+  margin-right: 12px;
+}
+
+.mi-carrito-qty-col {
+  max-width: 90px;
+}
+
+.mi-carrito-qty-col input {
+  text-align: center;
+}
+
+.mi-carrito-resumen {
+  margin-top: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.mi-carrito-resumen h4 {
+  margin-bottom: 1rem;
+}

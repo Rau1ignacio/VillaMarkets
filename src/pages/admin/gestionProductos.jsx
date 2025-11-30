@@ -2,7 +2,24 @@ import React, { useState, useEffect } from 'react';
 import productoService from '../../services/productoService';
 import tiendaService from '../../services/tiendaService';
 
+const formatearCLP = (valor) =>
+  'CLP ' +
+  new Intl.NumberFormat('es-CL', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(Math.round(Number(valor || 0)));
+
+const obtenerAdminActual = () => {
+  try {
+    const stored = localStorage.getItem('usuarioActual');
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
 const GestionProductos = () => {
+  const [admin] = useState(() => obtenerAdminActual());
   const [productos, setProductos] = useState([]);
   const [tiendas, setTiendas] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -21,15 +38,20 @@ const GestionProductos = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!admin?.id) {
+      setError('Debes iniciar sesión como administrador para gestionar tus productos.');
+      return;
+    }
     loadProductos();
     loadTiendas();
-  }, []);
+  }, [admin?.id]);
 
   const loadProductos = async () => {
+    if (!admin?.id) return;
     try {
       setLoading(true);
       setError('');
-      const data = await productoService.listar();
+      const data = await productoService.listarPorAdmin(admin.id);
       setProductos(data || []);
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Error al cargar productos';
@@ -41,8 +63,9 @@ const GestionProductos = () => {
   };
 
   const loadTiendas = async () => {
+    if (!admin?.id) return;
     try {
-      const data = await tiendaService.listar();
+      const data = await tiendaService.listar(admin.id);
       setTiendas(data || []);
     } catch (err) {
       console.error('Error al cargar tiendas:', err);
@@ -53,9 +76,12 @@ const GestionProductos = () => {
     const { name, value } = e.target;
     setForm((s) => ({
       ...s,
-      [name]: name === 'precio' || name === 'stock' || name === 'tiendaId'
-        ? (value === '' ? null : Number(value))
-        : value
+      [name]:
+        name === 'precio' || name === 'stock' || name === 'tiendaId'
+          ? value === ''
+            ? null
+            : Number(value)
+          : value
     }));
   };
 
@@ -75,17 +101,18 @@ const GestionProductos = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-
+    if (!admin?.id) {
+      alert('Debes iniciar sesión nuevamente.');
+      return;
+    }
     if (!form.nombre || !form.nombre.trim()) {
       alert('Debes ingresar el nombre del producto.');
       return;
     }
-
     if (!form.tiendaId) {
       alert('Debes seleccionar un minimarket para el producto.');
       return;
     }
-
     try {
       setLoading(true);
       setError('');
@@ -93,7 +120,6 @@ const GestionProductos = () => {
       await loadProductos();
       resetForm();
       setShowModal(false);
-
       if (window.Swal) {
         window.Swal.fire({
           icon: 'success',
@@ -109,7 +135,6 @@ const GestionProductos = () => {
       const errorMsg = err.response?.data?.message || err.message || 'Error al crear producto';
       setError(errorMsg);
       console.error('Error al crear producto:', err);
-
       if (window.Swal) {
         window.Swal.fire({
           icon: 'error',
@@ -127,7 +152,6 @@ const GestionProductos = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-
     try {
       setLoading(true);
       setError('');
@@ -135,7 +159,6 @@ const GestionProductos = () => {
       await loadProductos();
       resetForm();
       setShowModal(false);
-
       if (window.Swal) {
         window.Swal.fire({
           icon: 'success',
@@ -151,7 +174,6 @@ const GestionProductos = () => {
       const errorMsg = err.response?.data?.message || err.message || 'Error al actualizar producto';
       setError(errorMsg);
       console.error('Error al actualizar producto:', err);
-
       if (window.Swal) {
         window.Swal.fire({
           icon: 'error',
@@ -169,13 +191,11 @@ const GestionProductos = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar producto?')) return;
-
     try {
       setLoading(true);
       setError('');
       await productoService.eliminar(id);
       await loadProductos();
-
       if (window.Swal) {
         window.Swal.fire({
           icon: 'success',
@@ -189,7 +209,6 @@ const GestionProductos = () => {
       const errorMsg = err.response?.data?.message || err.message || 'Error al eliminar producto';
       setError(errorMsg);
       console.error('Error al eliminar producto:', err);
-
       if (window.Swal) {
         window.Swal.fire({
           icon: 'error',
@@ -235,15 +254,13 @@ const GestionProductos = () => {
 
   const editing = editingId !== null;
 
-  // Función para obtener el nombre de la tienda por ID
   const getTiendaNombre = (tiendaId) => {
-    const tienda = tiendas.find(t => t.id === tiendaId);
+    const tienda = tiendas.find((t) => t.id === tiendaId);
     return tienda ? tienda.nombre : 'Sin tienda';
   };
 
   return (
     <div className="container py-4">
-      {/* Mensaje de error global */}
       {error && (
         <div className="alert alert-danger alert-dismissible fade show" role="alert">
           <i className="fas fa-exclamation-triangle me-2"></i>
@@ -252,7 +269,6 @@ const GestionProductos = () => {
         </div>
       )}
 
-      {/* Encabezado mejorado */}
       <div className="bg-white rounded-3 shadow-sm p-4 mb-4">
         <div className="d-flex justify-content-between align-items-center">
           <div>
@@ -260,20 +276,22 @@ const GestionProductos = () => {
               <i className="fas fa-box-open me-2 text-primary"></i>
               Gestión de Productos
             </h2>
-            <p className="text-muted mb-0">Administra el catálogo de productos de todos los minimarkets</p>
+            <p className="text-muted mb-0">Administra el catálogo de productos de tus minimarkets</p>
           </div>
           <div className="d-flex gap-2">
-            <button className="btn btn-primary" onClick={startCreate} disabled={loading}>
+            <button className="btn btn-primary" onClick={startCreate} disabled={loading || !admin?.id}>
               <i className="fas fa-plus me-2"></i>Nuevo Producto
             </button>
-            <button className="btn btn-outline-primary" onClick={loadProductos} disabled={loading}>
+            <button className="btn btn-outline-primary" onClick={loadProductos} disabled={loading || !admin?.id}>
               <i className="fas fa-sync-alt me-2"></i>Actualizar
             </button>
           </div>
         </div>
       </div>
 
-      {loading && productos.length === 0 ? (
+      {!admin?.id ? (
+        <div className="alert alert-warning">Debes iniciar sesión como administrador para gestionar productos.</div>
+      ) : loading && productos.length === 0 ? (
         <div className="text-center py-5">
           <div className="spinner-border text-primary mb-3" role="status">
             <span className="visually-hidden">Cargando...</span>
@@ -284,8 +302,11 @@ const GestionProductos = () => {
         <div className="row">
           <div className="col-md-12">
             <div className="list-group shadow-sm">
-              {productos.map(p => (
-                <div key={p.id} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-start border-5 border-primary border-opacity-25">
+              {productos.map((p) => (
+                <div
+                  key={p.id}
+                  className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-start border-5 border-primary border-opacity-25"
+                >
                   <div className="d-flex align-items-center gap-3">
                     <div className="bg-light rounded p-2">
                       {p.imagen ? (
@@ -293,7 +314,9 @@ const GestionProductos = () => {
                           src={p.imagen.startsWith('http') ? p.imagen : `/images/${p.imagen}`}
                           alt={p.nombre}
                           style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
-                          onError={(e) => { e.target.style.display = 'none'; }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
                         />
                       ) : (
                         <i className="fas fa-box text-primary fs-4"></i>
@@ -302,10 +325,18 @@ const GestionProductos = () => {
                     <div>
                       <h6 className="mb-0 fw-bold">{p.nombre}</h6>
                       <div className="text-muted small">
-                        <span className="badge bg-success bg-opacity-10 text-success me-2">CLP ${p.precio?.toLocaleString() || 0}</span>
-                        <span className="badge bg-primary bg-opacity-10 text-primary me-2">Stock: {p.stock || 0}</span>
-                        {p.categoria && <span className="badge bg-info bg-opacity-10 text-info me-2">{p.categoria}</span>}
-                        <span className="badge bg-secondary bg-opacity-10 text-secondary">{getTiendaNombre(p.tiendaId)}</span>
+                        <span className="badge bg-success bg-opacity-10 text-success me-2">
+                          {formatearCLP(p.precio)}
+                        </span>
+                        <span className="badge bg-primary bg-opacity-10 text-primary me-2">
+                          Stock: {p.stock || 0}
+                        </span>
+                        {p.categoria && (
+                          <span className="badge bg-info bg-opacity-10 text-info me-2">{p.categoria}</span>
+                        )}
+                        <span className="badge bg-secondary bg-opacity-10 text-secondary">
+                          {getTiendaNombre(p.tiendaId)}
+                        </span>
                       </div>
                       {p.descripcion && <div className="text-muted small mt-1">{p.descripcion}</div>}
                     </div>
@@ -334,10 +365,15 @@ const GestionProductos = () => {
         </div>
       )}
 
-      {/* Modal: menú detallado para agregar/editar */}
       {showModal && (
-        <div className="modal show d-block" tabIndex="-1" role="dialog" onClick={() => setShowModal(false)} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg" role="document" onClick={e => e.stopPropagation()}>
+        <div
+          className="modal show d-block"
+          tabIndex="-1"
+          role="dialog"
+          onClick={() => setShowModal(false)}
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+        >
+          <div className="modal-dialog modal-lg" role="document" onClick={(e) => e.stopPropagation()}>
             <div className="modal-content border-0 shadow-lg">
               <div className="modal-header border-0 bg-primary bg-opacity-10">
                 <h5 className="modal-title">
@@ -351,24 +387,51 @@ const GestionProductos = () => {
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <label className="form-label">Nombre *</label>
-                      <input name="nombre" className="form-control" placeholder="Nombre del producto" value={form.nombre} onChange={handleChange} required disabled={loading} />
+                      <input
+                        name="nombre"
+                        className="form-control"
+                        placeholder="Nombre del producto"
+                        value={form.nombre}
+                        onChange={handleChange}
+                        required
+                        disabled={loading}
+                      />
                     </div>
                     <div className="col-md-6 mb-3">
                       <label className="form-label">Precio *</label>
-                      <input name="precio" className="form-control" type="number" placeholder="Precio" value={form.precio} onChange={handleChange} min="0" required disabled={loading} />
+                      <input
+                        name="precio"
+                        className="form-control"
+                        type="number"
+                        placeholder="Precio"
+                        value={form.precio}
+                        onChange={handleChange}
+                        min="0"
+                        required
+                        disabled={loading}
+                      />
                     </div>
                   </div>
 
                   <div className="mb-3">
                     <label className="form-label">Imagen (URL o nombre de archivo)</label>
-                    <input name="imagen" className="form-control" placeholder="Ej: arroz.jpg o https://..." value={form.imagen} onChange={handleChange} disabled={loading} />
+                    <input
+                      name="imagen"
+                      className="form-control"
+                      placeholder="Ej: arroz.jpg o https://..."
+                      value={form.imagen}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
                     {form.imagen && (
                       <div className="mt-2">
                         <img
                           src={form.imagen.startsWith('http') ? form.imagen : `/images/${form.imagen}`}
                           alt="Vista previa"
                           style={{ maxWidth: '100%', maxHeight: 120, borderRadius: 8, border: '1px solid #ccc' }}
-                          onError={e => { e.target.style.display = 'none'; }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
                         />
                       </div>
                     )}
@@ -376,13 +439,28 @@ const GestionProductos = () => {
 
                   <div className="mb-3">
                     <label className="form-label">Descripción</label>
-                    <textarea name="descripcion" className="form-control" placeholder="Descripción del producto" value={form.descripcion} onChange={handleChange} rows={2} disabled={loading} />
+                    <textarea
+                      name="descripcion"
+                      className="form-control"
+                      placeholder="Descripción del producto"
+                      value={form.descripcion}
+                      onChange={handleChange}
+                      rows={2}
+                      disabled={loading}
+                    />
                   </div>
 
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <label className="form-label">Categoría *</label>
-                      <select name="categoria" className="form-select" value={form.categoria} onChange={handleChange} required disabled={loading}>
+                      <select
+                        name="categoria"
+                        className="form-select"
+                        value={form.categoria}
+                        onChange={handleChange}
+                        required
+                        disabled={loading}
+                      >
                         <option value="">Selecciona una categoría</option>
                         <option value="abarrotes">Abarrotes</option>
                         <option value="lacteos">Lácteos</option>
@@ -397,16 +475,35 @@ const GestionProductos = () => {
                     </div>
                     <div className="col-md-6 mb-3">
                       <label className="form-label">Stock *</label>
-                      <input name="stock" className="form-control" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} min="0" required disabled={loading} />
+                      <input
+                        name="stock"
+                        className="form-control"
+                        type="number"
+                        placeholder="Stock"
+                        value={form.stock}
+                        onChange={handleChange}
+                        min="0"
+                        required
+                        disabled={loading}
+                      />
                     </div>
                   </div>
 
                   <div className="mb-3">
                     <label className="form-label">Minimarket *</label>
-                    <select name="tiendaId" className="form-select" value={form.tiendaId || ''} onChange={handleChange} required disabled={loading}>
+                    <select
+                      name="tiendaId"
+                      className="form-select"
+                      value={form.tiendaId || ''}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
                       <option value="">Selecciona un minimarket</option>
-                      {tiendas.map(t => (
-                        <option key={t.id} value={t.id}>{t.nombre}</option>
+                      {tiendas.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.nombre}
+                        </option>
                       ))}
                     </select>
                     {tiendas.length === 0 && (
@@ -423,7 +520,7 @@ const GestionProductos = () => {
                     </button>
                     <button className="btn btn-primary" type="submit" disabled={loading}>
                       <i className={`fas fa-${editing ? 'save' : 'plus'} me-2`}></i>
-                      {loading ? 'Guardando...' : (editing ? 'Guardar cambios' : 'Agregar producto')}
+                      {loading ? 'Guardando...' : editing ? 'Guardar cambios' : 'Agregar producto'}
                     </button>
                   </div>
                 </form>

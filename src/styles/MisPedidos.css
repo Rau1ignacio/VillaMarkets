@@ -1,0 +1,25 @@
+.mis-pedidos-productos-col {
+  min-width: 220px;
+}
+
+.mis-pedidos-productos-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.mis-pedidos-producto-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.mis-pedidos-producto-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 4px;
+  margin-right: 8px;
+}

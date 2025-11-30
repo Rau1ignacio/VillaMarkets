@@ -1,31 +1,28 @@
-// src/pages/admin/Reportes.jsx (por ejemplo)
 import React, { useEffect, useMemo, useState } from 'react';
 import tiendaService from '../../services/tiendaService';
 import productoService from '../../services/productoService';
+import pedidoService from '../../services/pedidoService';
+import '../../styles/Reportes.css';
 
-// =========================
-// Utilidades
-// =========================
 const formatoCLP = (valor) =>
   new Intl.NumberFormat('es-CL', {
     style: 'currency',
     currency: 'CLP',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 0
   }).format(Number(valor || 0));
 
-function SvgBarChart({
-  data = [],
-  labels = [],
-  color = '#16a34a',
-  width = 700,
-  height = 220,
-}) {
+const obtenerAdminActual = () => {
+  try {
+    const stored = localStorage.getItem('usuarioActual');
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+const SvgBarChart = ({ data = [], labels = [], color = '#16a34a', width = 700, height = 220 }) => {
   if (!data.length) {
-    return (
-      <div style={{ padding: 16, fontSize: 14, color: '#666' }}>
-        No hay datos suficientes para generar el gráfico.
-      </div>
-    );
+    return <div className="reportes-chart-empty">No hay datos suficientes para generar el gráfico.</div>;
   }
 
   const max = Math.max(...data, 1);
@@ -36,42 +33,20 @@ function SvgBarChart({
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-      {/* fondo */}
       <rect x={0} y={0} width={width} height={height} fill="white" rx={12} />
-      {/* eje base */}
-      <line
-        x1={pad}
-        y1={height - pad}
-        x2={width - pad}
-        y2={height - pad}
-        stroke="#e5e7eb"
-        strokeWidth={1}
-      />
+      <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="#e5e7eb" strokeWidth={1} />
       {data.map((v, i) => {
         const h = (v / max) * innerH;
         const x = pad + i * bw + bw * 0.15;
         const w = bw * 0.7;
         const y = pad + (innerH - h);
-
         return (
           <g key={i}>
             <rect x={x} y={y} width={w} height={h} fill={color} rx={8} />
-            <text
-              x={x + w / 2}
-              y={y - 6}
-              fontSize={11}
-              textAnchor="middle"
-              fill="#374151"
-            >
+            <text x={x + w / 2} y={y - 6} fontSize={11} textAnchor="middle" fill="#374151">
               {v}
             </text>
-            <text
-              x={x + w / 2}
-              y={height - pad + 12}
-              fontSize={11}
-              textAnchor="middle"
-              fill="#6b7280"
-            >
+            <text x={x + w / 2} y={height - pad + 12} fontSize={11} textAnchor="middle" fill="#6b7280">
               {labels[i]}
             </text>
           </g>
@@ -79,141 +54,165 @@ function SvgBarChart({
       })}
     </svg>
   );
-}
+};
 
-// =========================
-// Componente principal
-// =========================
 export default function Reportes() {
+  const [admin] = useState(() => obtenerAdminActual());
   const [tiendas, setTiendas] = useState([]);
   const [selectedTiendaId, setSelectedTiendaId] = useState('');
   const [productos, setProductos] = useState([]);
-
-  const [loadingTiendas, setLoadingTiendas] = useState(true);
-  const [loadingProductos, setLoadingProductos] = useState(false);
+  const [pedidos, setPedidos] = useState([]);
+  const [loadingTiendas, setLoadingTiendas] = useState(false);
+  const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [error, setError] = useState('');
 
-  // Cargar tiendas desde el backend
   useEffect(() => {
-    const fetchTiendas = async () => {
+    if (!admin?.id) {
+      setError('Debes iniciar sesión como administrador para revisar tus reportes.');
+      setTiendas([]);
+      setSelectedTiendaId('');
+      return;
+    }
+
+    const cargarTiendas = async () => {
       try {
         setLoadingTiendas(true);
         setError('');
-        const data = await tiendaService.listar(); // GET /api/minimarkets
+        const data = await tiendaService.listar(admin.id);
         setTiendas(data || []);
         if (data && data.length > 0) {
-          setSelectedTiendaId(data[0].id);
+          setSelectedTiendaId(String(data[0].id));
+        } else {
+          setSelectedTiendaId('');
         }
       } catch (err) {
         console.error('Error cargando tiendas:', err);
-        setError('No se pudieron cargar las tiendas desde el backend.');
+        setError('No se pudieron cargar las tiendas asociadas a tu cuenta.');
       } finally {
         setLoadingTiendas(false);
       }
     };
 
-    fetchTiendas();
-  }, []);
+    cargarTiendas();
+  }, [admin?.id]);
 
-  // Cargar productos de la tienda seleccionada
   useEffect(() => {
-    const fetchProductos = async () => {
-      if (!selectedTiendaId) {
-        setProductos([]);
-        return;
-      }
+    const tiendaId = Number(selectedTiendaId);
+    if (!tiendaId) {
+      setProductos([]);
+      setPedidos([]);
+      return;
+    }
+
+    const cargarDetalle = async () => {
       try {
-        setLoadingProductos(true);
+        setLoadingDetalle(true);
         setError('');
-        const data = await productoService.listarPorTienda(selectedTiendaId);
-        setProductos(data || []);
+        const [productosResp, pedidosResp] = await Promise.all([
+          productoService.listarPorTienda(tiendaId),
+          pedidoService.listarPorTienda(tiendaId)
+        ]);
+        setProductos(productosResp || []);
+        setPedidos(pedidosResp || []);
       } catch (err) {
-        console.error('Error cargando productos:', err);
-        setError('No se pudieron cargar los productos de la tienda seleccionada.');
+        console.error('Error cargando detalle de tienda:', err);
+        setError('No se pudo cargar la información de inventario/pedidos para la tienda seleccionada.');
         setProductos([]);
+        setPedidos([]);
       } finally {
-        setLoadingProductos(false);
+        setLoadingDetalle(false);
       }
     };
 
-    fetchProductos();
+    cargarDetalle();
   }, [selectedTiendaId]);
 
-  // Métricas calculadas
-  const metricas = useMemo(() => {
+  const metricasInventario = useMemo(() => {
     const totalProductos = productos.length;
-    const totalStock = productos.reduce(
-      (acc, p) => acc + (p.stock || 0),
+    const totalStock = productos.reduce((acc, p) => acc + Number(p.stock || 0), 0);
+    const valorInventario = productos.reduce(
+      (acc, p) => acc + Number(p.precio || 0) * Number(p.stock || 0),
       0
     );
-    const valorInventario = productos.reduce((acc, p) => {
-      const precio = Number(p.precio || 0);
-      const stock = Number(p.stock || 0);
-      return acc + precio * stock;
-    }, 0);
-
     const precioPromedio =
       totalProductos > 0
-        ? productos.reduce((acc, p) => acc + Number(p.precio || 0), 0) /
-        totalProductos
+        ? productos.reduce((acc, p) => acc + Number(p.precio || 0), 0) / totalProductos
         : 0;
-
-    return {
-      totalProductos,
-      totalStock,
-      valorInventario,
-      precioPromedio,
-    };
+    return { totalProductos, totalStock, valorInventario, precioPromedio };
   }, [productos]);
 
-  // Datos para el gráfico: top 7 productos por stock
+  const metricasPedidos = useMemo(() => {
+    if (!pedidos.length) {
+      return { total: 0, totalVentas: 0, clientes: 0 };
+    }
+    const totalVentas = pedidos.reduce((acc, p) => acc + Number(p.total || 0), 0);
+    const clientesUnicos = new Set(
+      pedidos.map((p) => p.usuarioNombre || p.usuarioId || 'Cliente desconocido')
+    ).size;
+    return { total: pedidos.length, totalVentas, clientes: clientesUnicos };
+  }, [pedidos]);
+
   const chart = useMemo(() => {
     if (!productos.length) return { labels: [], data: [] };
-
     const ordenados = [...productos]
       .sort((a, b) => (b.stock || 0) - (a.stock || 0))
       .slice(0, 7);
-
     const labels = ordenados.map((p) =>
-      (p.nombre || '').length > 10 ? (p.nombre || '').slice(0, 10) + '…' : p.nombre
+      (p.nombre || '').length > 12 ? `${p.nombre.substring(0, 12)}…` : p.nombre
     );
     const data = ordenados.map((p) => p.stock || 0);
-
     return { labels, data };
   }, [productos]);
 
-  const tiendaActual = tiendas.find((t) => t.id === selectedTiendaId);
+  const pedidosRecientes = useMemo(
+    () =>
+      [...pedidos]
+        .sort((a, b) => new Date(b.fechaPedido || 0) - new Date(a.fechaPedido || 0))
+        .slice(0, 6),
+    [pedidos]
+  );
 
-  // =========================
-  // HTML
-  // =========================
+  const tiendaActual = tiendas.find((t) => String(t.id) === selectedTiendaId);
+
+  if (!admin?.id) {
+    return (
+      <div className="reportes-container">
+        <div className="reportes-alert reportes-alert-warning">
+          Debes iniciar sesión como administrador para revisar tus reportes.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
-      <h2 className="mb-3">Reportes de Inventario por Tienda</h2>
-      <p style={{ color: '#6b7280', fontSize: 14 }}>
-        Estos reportes se generan en base a los datos reales de <strong>tiendas</strong> y
-        <strong> productos</strong> del backend.
-      </p>
+    <div className="reportes-container">
+      <section className="reportes-header">
+        <div>
+          <p className="reportes-eyebrow">Panel de control</p>
+          <h1>Reportes de Inventario y Ventas</h1>
+          <p>
+            Visualiza el estado de tus tiendas, productos y pedidos en tiempo real usando los datos
+            del backend.
+          </p>
+        </div>
+        <div className="reportes-badge">
+          <i className="fas fa-user-shield me-2" />
+          {admin?.nombres || admin?.username}
+        </div>
+      </section>
 
-      {/* Selector de tienda */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 12,
-          alignItems: 'center',
-          marginTop: 12,
-          marginBottom: 20,
-          flexWrap: 'wrap',
-        }}
-      >
-        <label style={{ fontWeight: 500 }}>Seleccionar tienda:</label>
+      {error && <div className="reportes-alert reportes-alert-error">{error}</div>}
+
+      <div className="reportes-selector">
+        <label htmlFor="tienda-select">Seleccionar tienda</label>
         {loadingTiendas ? (
-          <span>Cargando tiendas...</span>
+          <span className="reportes-muted">Cargando tiendas...</span>
         ) : (
           <select
-            value={selectedTiendaId || ''}
-            onChange={(e) => setSelectedTiendaId(Number(e.target.value))}
-            style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #d1d5db' }}
+            id="tienda-select"
+            className="reportes-select"
+            value={selectedTiendaId}
+            onChange={(e) => setSelectedTiendaId(e.target.value)}
           >
             {tiendas.length === 0 ? (
               <option value="">(No hay tiendas registradas)</option>
@@ -229,159 +228,146 @@ export default function Reportes() {
       </div>
 
       {tiendaActual && (
-        <div
-          style={{
-            padding: 12,
-            borderRadius: 8,
-            backgroundColor: '#f9fafb',
-            border: '1px solid #e5e7eb',
-            marginBottom: 20,
-            fontSize: 14,
-          }}
-        >
-          <strong>Tienda seleccionada:</strong> {tiendaActual.nombre}
-          {tiendaActual.direccion && (
-            <>
-              {' · '}
-              <span style={{ color: '#6b7280' }}>{tiendaActual.direccion}</span>
-            </>
-          )}
+        <div className="reportes-selected-store">
+          <div>
+            <h3>{tiendaActual.nombre}</h3>
+            <p>{tiendaActual.direccion || 'Sin dirección registrada'}</p>
+          </div>
+          <div className="reportes-store-meta">
+            {tiendaActual.comuna && <span>{tiendaActual.comuna}</span>}
+            {tiendaActual.region && <span>{tiendaActual.region}</span>}
+            {tiendaActual.horario && <span>{tiendaActual.horario}</span>}
+          </div>
         </div>
       )}
 
-      {error && (
-        <div
-          style={{
-            padding: 10,
-            borderRadius: 6,
-            backgroundColor: '#fee2e2',
-            color: '#b91c1c',
-            fontSize: 14,
-            marginBottom: 16,
-          }}
-        >
-          {error}
+      <div className="reportes-grid">
+        <div className="reportes-card reportes-card-kpi">
+          <p>Productos activos</p>
+          <strong>{metricasInventario.totalProductos}</strong>
         </div>
-      )}
-
-      {/* Métricas rápidas */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 16,
-          marginBottom: 24,
-        }}
-      >
-        <div className="shadow-sm" style={cardStyle}>
-          <span style={labelStyle}>Productos activos</span>
-          <strong style={valueStyle}>{metricas.totalProductos}</strong>
+        <div className="reportes-card reportes-card-kpi">
+          <p>Stock total</p>
+          <strong>{metricasInventario.totalStock}</strong>
         </div>
-        <div className="shadow-sm" style={cardStyle}>
-          <span style={labelStyle}>Stock total</span>
-          <strong style={valueStyle}>{metricas.totalStock}</strong>
+        <div className="reportes-card reportes-card-kpi">
+          <p>Valor inventario</p>
+          <strong>{formatoCLP(metricasInventario.valorInventario)}</strong>
         </div>
-        <div className="shadow-sm" style={cardStyle}>
-          <span style={labelStyle}>Valor de inventario</span>
-          <strong style={valueStyle}>{formatoCLP(metricas.valorInventario)}</strong>
+        <div className="reportes-card reportes-card-kpi">
+          <p>Precio promedio</p>
+          <strong>{formatoCLP(metricasInventario.precioPromedio)}</strong>
         </div>
-        <div className="shadow-sm" style={cardStyle}>
-          <span style={labelStyle}>Precio promedio</span>
-          <strong style={valueStyle}>{formatoCLP(metricas.precioPromedio)}</strong>
+        <div className="reportes-card reportes-card-kpi reportes-card-accent">
+          <p>Pedidos totales</p>
+          <strong>{metricasPedidos.total}</strong>
+        </div>
+        <div className="reportes-card reportes-card-kpi reportes-card-accent">
+          <p>Ventas de la tienda</p>
+          <strong>{formatoCLP(metricasPedidos.totalVentas)}</strong>
+        </div>
+        <div className="reportes-card reportes-card-kpi reportes-card-accent">
+          <p>Clientes únicos</p>
+          <strong>{metricasPedidos.clientes}</strong>
         </div>
       </div>
 
-      {/* Gráfico */}
-      <div
-        style={{
-          borderRadius: 12,
-          border: '1px solid #e5e7eb',
-          padding: 16,
-          backgroundColor: '#ffffff',
-          marginBottom: 24,
-        }}
-      >
-        <h4 style={{ marginBottom: 8 }}>Top productos por stock</h4>
-        <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>
-          Se muestran los hasta 7 productos con mayor stock de la tienda seleccionada.
-        </p>
-        {loadingProductos ? (
-          <p>Cargando productos...</p>
+      <section className="reportes-card">
+        <div className="reportes-card-head">
+          <div>
+            <h4>Top productos por stock</h4>
+            <p>Se muestran los productos con mayor stock para la tienda seleccionada.</p>
+          </div>
+        </div>
+        {loadingDetalle ? (
+          <p className="reportes-muted">Cargando información...</p>
         ) : (
-          <SvgBarChart data={chart.data} labels={chart.labels} />
-        )}
-      </div>
-
-      {/* Tabla de productos */}
-      <div
-        style={{
-          borderRadius: 12,
-          border: '1px solid #e5e7eb',
-          padding: 16,
-          backgroundColor: '#ffffff',
-        }}
-      >
-        <h4 style={{ marginBottom: 8 }}>Detalle de productos</h4>
-        {loadingProductos ? (
-          <p>Cargando productos...</p>
-        ) : productos.length === 0 ? (
-          <p style={{ fontSize: 14, color: '#6b7280' }}>
-            No hay productos registrados para esta tienda.
-          </p>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="table table-sm table-striped align-middle">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Categoría</th>
-                  <th className="text-end">Precio</th>
-                  <th className="text-end">Stock</th>
-                  <th className="text-end">Total (Precio x Stock)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productos.map((p) => {
-                  const totalLinea = Number(p.precio || 0) * Number(p.stock || 0);
-                  return (
-                    <tr key={p.id}>
-                      <td>{p.nombre}</td>
-                      <td>{p.categoria || '-'}</td>
-                      <td className="text-end">{formatoCLP(p.precio)}</td>
-                      <td className="text-end">{p.stock ?? 0}</td>
-                      <td className="text-end">{formatoCLP(totalLinea)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="reportes-chart-wrapper">
+            <SvgBarChart data={chart.data} labels={chart.labels} />
           </div>
         )}
+      </section>
+
+      <div className="reportes-flex">
+        <section className="reportes-card reportes-table-card">
+          <div className="reportes-card-head">
+            <div>
+              <h4>Detalle de productos</h4>
+              <p>
+                Información real proveniente del backend. Ajusta stock y precios desde Gestión de
+                Productos.
+              </p>
+            </div>
+          </div>
+          {loadingDetalle ? (
+            <p className="reportes-muted">Cargando productos...</p>
+          ) : productos.length === 0 ? (
+            <p className="reportes-muted">No hay productos registrados para esta tienda.</p>
+          ) : (
+            <div className="reportes-table-wrapper">
+              <table className="table table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th className="text-end">Precio</th>
+                    <th className="text-end">Stock</th>
+                    <th className="text-end">Total (P x S)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productos.map((p) => {
+                    const totalLinea = Number(p.precio || 0) * Number(p.stock || 0);
+                    return (
+                      <tr key={p.id}>
+                        <td>{p.nombre}</td>
+                        <td>{p.categoria || '-'}</td>
+                        <td className="text-end">{formatoCLP(p.precio)}</td>
+                        <td className="text-end">{p.stock ?? 0}</td>
+                        <td className="text-end">{formatoCLP(totalLinea)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="reportes-card reportes-orders-card">
+          <div className="reportes-card-head">
+            <div>
+              <h4>Pedidos recientes</h4>
+              <p>Basado en los datos reales de pedidos por tienda desde el backend.</p>
+            </div>
+          </div>
+          {loadingDetalle ? (
+            <p className="reportes-muted">Cargando pedidos...</p>
+          ) : pedidosRecientes.length === 0 ? (
+            <p className="reportes-muted">Esta tienda aún no registra pedidos.</p>
+          ) : (
+            <ul className="reportes-orders-list">
+              {pedidosRecientes.map((pedido) => (
+                <li key={pedido.id}>
+                  <div>
+                    <strong>#{pedido.id}</strong>
+                    <span>{pedido.usuarioNombre || pedido.usuarioId || 'Cliente'}</span>
+                    <span className="reportes-muted">{new Date(pedido.fechaPedido).toLocaleString('es-CL')}</span>
+                  </div>
+                  <div className="text-end">
+                    <span className="reportes-order-badge">{pedido.estado || 'PENDIENTE'}</span>
+                    <div>{formatoCLP(pedido.total)}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
 
-      <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 10 }}>
-        Reporte generado en base a los datos del backend (tiendas y productos).
+      <p className="reportes-footer-note">
+        Reporte alimentado directamente desde los endpoints reales de tiendas, productos y pedidos.
       </p>
     </div>
   );
 }
-
-// Estilos inline reutilizables
-const cardStyle = {
-  padding: '12px 14px',
-  borderRadius: 10,
-  backgroundColor: '#ffffff',
-  border: '1px solid #e5e7eb',
-};
-
-const labelStyle = {
-  fontSize: 12,
-  color: '#6b7280',
-  marginBottom: 4,
-  display: 'block',
-};
-
-const valueStyle = {
-  fontSize: 18,
-  color: '#111827',
-};

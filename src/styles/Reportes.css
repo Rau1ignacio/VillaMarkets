@@ -1,0 +1,254 @@
+.reportes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.reportes-header {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.reportes-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #0f172a;
+}
+
+.reportes-header p {
+  margin: 0.25rem 0 0;
+  color: #475569;
+}
+
+.reportes-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: #0f766e;
+  margin-bottom: 0.35rem;
+}
+
+.reportes-badge {
+  border: 1px solid #10b981;
+  color: #047857;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.reportes-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.reportes-selector label {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.reportes-select {
+  min-width: 230px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.reportes-selected-store {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.reportes-selected-store h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.reportes-store-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.reportes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.reportes-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  padding: 1.25rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.reportes-card-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.reportes-card-kpi p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.reportes-card-kpi strong {
+  font-size: 1.6rem;
+  color: #0f172a;
+}
+
+.reportes-card-accent {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-color: #bbf7d0;
+}
+
+.reportes-card-accent strong {
+  color: #047857;
+}
+
+.reportes-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.reportes-card-head h4 {
+  margin: 0;
+}
+
+.reportes-card-head p {
+  margin: 0.15rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.reportes-chart-wrapper {
+  overflow-x: auto;
+}
+
+.reportes-chart-empty {
+  padding: 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.reportes-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.reportes-table-card {
+  flex: 2;
+  min-width: 320px;
+}
+
+.reportes-table-wrapper {
+  overflow-x: auto;
+}
+
+.reportes-orders-card {
+  flex: 1;
+  min-width: 280px;
+}
+
+.reportes-orders-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reportes-orders-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.reportes-order-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f766e;
+  background: #ccfbf1;
+}
+
+.reportes-muted {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.reportes-alert {
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
+}
+
+.reportes-alert-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.reportes-alert-warning {
+  border: 1px solid #fde68a;
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.reportes-footer-note {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .reportes-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reportes-flex {
+    flex-direction: column;
+  }
+}

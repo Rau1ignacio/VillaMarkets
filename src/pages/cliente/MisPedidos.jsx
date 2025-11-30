@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import pedidoService from '../../services/pedidoService';
+import '../../styles/MisPedidos.css';
 
 const formatearCLP = (valor) =>
   'CLP ' +
@@ -146,7 +147,7 @@ const MisPedidos = () => {
                     <th>Fecha</th>
                     <th>Estado</th>
                     <th>Total</th>
-                    <th style={{ minWidth: 220 }}>Productos</th>
+                    <th className="mis-pedidos-productos-col">Productos</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -160,15 +161,7 @@ const MisPedidos = () => {
                       </td>
                       <td>
                         {pedido.items && pedido.items.length > 0 ? (
-                          <ul
-                            style={{
-                              margin: 0,
-                              padding: 0,
-                              listStyle: 'none',
-                              maxHeight: 140,
-                              overflowY: 'auto'
-                            }}
-                          >
+                          <ul className="mis-pedidos-productos-list">
                             {pedido.items.map((item, idx) => {
                               const imagenSrc =
                                 typeof item.imagenProducto === 'string' && item.imagenProducto.length > 0
@@ -180,22 +173,12 @@ const MisPedidos = () => {
                               return (
                                 <li
                                   key={`${pedido.id || 'local'}-${idx}`}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    marginBottom: 4
-                                  }}
+                                  className="mis-pedidos-producto-item"
                                 >
                                   <img
                                     src={imagenSrc}
                                     alt={item.productoNombre || item.productoId}
-                                    style={{
-                                      width: 32,
-                                      height: 32,
-                                      objectFit: 'contain',
-                                      borderRadius: 4,
-                                      marginRight: 8
-                                    }}
+                                    className="mis-pedidos-producto-img"
                                     onError={(e) => {
                                       e.currentTarget.src = '/images/default.jpg';
                                     }}

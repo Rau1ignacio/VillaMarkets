@@ -1,45 +1,116 @@
 import React, { useState } from 'react';
-/// Componente para manejar el método de pago
+import '../../styles/MetodoPago.css';
+
 const MetodoPago = ({ total, onConfirmar }) => {
-  const [nombre, setNombre] = useState('');
-  const [numero, setNumero] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [confirmado, setConfirmado] = useState(false);
+  const [form, setForm] = useState({
+    nombre: '',
+    correo: '',
+    metodoPago: 'transferencia',
+    tipoEntrega: 'domicilio',
+    direccion: '',
+    comentarios: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setConfirmado(true);
-    if (onConfirmar) onConfirmar({ nombre, numero, correo });
+    if (onConfirmar) {
+      onConfirmar(form);
+    }
   };
 
-
-  if (confirmado) {
-    return (
-      <div style={{ background: '#d4edda', padding: 20, borderRadius: 10 }}>
-        <h4>¡Pago confirmado!</h4>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: '0 auto', background: '#f8f9fa', padding: 20, borderRadius: 10 }}>
-      <h3>Datos de Pago</h3>
+    <form className="metodo-pago-form" onSubmit={handleSubmit}>
+      <h3>Confirmar Pago</h3>
+      <p className="text-muted mb-3">Completa tus datos para finalizar el pedido.</p>
+
       <div className="mb-3">
-        <label>Nombre en la tarjeta o cuenta</label>
-        <input type="text" className="form-control" value={nombre} onChange={e => setNombre(e.target.value)} required />
+        <label className="form-label">Nombre completo</label>
+        <input
+          type="text"
+          className="form-control"
+          name="nombre"
+          value={form.nombre}
+          onChange={handleChange}
+          required
+        />
       </div>
+
       <div className="mb-3">
-        <label>Número de tarjeta o cuenta</label>
-        <input type="text" className="form-control" value={numero} onChange={e => setNumero(e.target.value)} required />
+        <label className="form-label">Correo electrónico</label>
+        <input
+          type="email"
+          className="form-control"
+          name="correo"
+          value={form.correo}
+          onChange={handleChange}
+          required
+        />
       </div>
+
       <div className="mb-3">
-        <label>Correo electrónico</label>
-        <input type="email" className="form-control" value={correo} onChange={e => setCorreo(e.target.value)} required />
+        <label className="form-label">Método de pago</label>
+        <select
+          className="form-select"
+          name="metodoPago"
+          value={form.metodoPago}
+          onChange={handleChange}
+        >
+          <option value="transferencia">Transferencia</option>
+          <option value="tarjeta">Tarjeta</option>
+          <option value="efectivo">Efectivo</option>
+        </select>
       </div>
+
       <div className="mb-3">
-        <b>Total a pagar: CLP ${total}</b>
+        <label className="form-label">Tipo de entrega</label>
+        <select
+          className="form-select"
+          name="tipoEntrega"
+          value={form.tipoEntrega}
+          onChange={handleChange}
+        >
+          <option value="domicilio">Entrega a domicilio</option>
+          <option value="retiro">Retiro en tienda</option>
+        </select>
       </div>
-      <button type="submit" className="btn btn-success">Confirmar Pago</button>
+
+      {form.tipoEntrega === 'domicilio' && (
+        <div className="mb-3">
+          <label className="form-label">Dirección de entrega</label>
+          <textarea
+            className="form-control"
+            name="direccion"
+            value={form.direccion}
+            onChange={handleChange}
+            rows={2}
+            required
+          />
+        </div>
+      )}
+
+      <div className="mb-3">
+        <label className="form-label">Comentarios</label>
+        <textarea
+          className="form-control"
+          name="comentarios"
+          value={form.comentarios}
+          onChange={handleChange}
+          rows={2}
+        />
+      </div>
+
+      <div className="mb-3 fw-bold">
+        Total a pagar: <span className="text-success">{total}</span>
+      </div>
+
+      <button type="submit" className="btn btn-success w-100">
+        Confirmar pedido
+      </button>
     </form>
   );
 };

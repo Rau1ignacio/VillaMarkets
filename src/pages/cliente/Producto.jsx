@@ -66,6 +66,7 @@ const Producto = () => {
   // 🔹 Agregar al carrito (backend + fallback localStorage)
   const agregarAlCarrito = async (producto) => {
     const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+    const carritoKey = usuarioActual?.id ? `carrito_${usuarioActual.id}` : 'carrito_guest';
 
     // Si hay usuario logueado, usamos el carrito real del backend
     if (usuarioActual && localStorage.getItem('authToken')) {
@@ -104,7 +105,7 @@ const Producto = () => {
           cantidad: 1
         }];
       }
-      localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
+      localStorage.setItem(carritoKey, JSON.stringify(nuevoCarrito));
       return nuevoCarrito;
     });
 
