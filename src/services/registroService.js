@@ -6,7 +6,7 @@ const registroService = {
    * @param {Object} userData - Datos del usuario
    * @returns {Promise}
    */
-  registrar: (userData) => 
+  registrar: (userData) =>
     api.post('/v1/usuarios/register', userData)
       .then(r => r.data)
       .catch(error => {

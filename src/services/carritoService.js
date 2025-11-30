@@ -1,10 +1,10 @@
 import api from './api';
 
 const carritoService = {
-  obtener: () => api.get('/v1/carritos').then(r => r.data),
-  agregarItem: (item) => api.post('/v1/carritos/items', item).then(r => r.data),
-  eliminarItem: (productId) => api.delete(`/v1/carritos/items/${productId}`).then(r => r.data),
-  limpiar: () => api.post('/v1/carritos/clear').then(r => r.data),
+  obtenerPorUsuario: (usuarioId) => api.get(`/v1/carritos/usuario/${usuarioId}`).then(r => r.data),
+  agregarItem: (usuarioId, item) => api.post(`/v1/carritos/usuario/${usuarioId}/add`, item).then(r => r.data),
+  eliminarItem: (carritoId, itemId) => api.delete(`/v1/carritos/${carritoId}/item/${itemId}`).then(r => r.data),
+  limpiar: (carritoId) => api.delete(`/v1/carritos/${carritoId}/clear`).then(r => r.data),
 };
 
 export default carritoService;
