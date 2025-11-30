@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import productoService from '../../services/productoService';
+import carritoService from '../../services/carritoService';
 
 const categorias = [
   { value: 'todos', label: 'Todas las categorías' },
@@ -31,27 +33,39 @@ const Producto = () => {
   const animacionTimeoutRef = useRef(null);
 
   useEffect(() => {
-    // Leer productos desde localStorage, si no existen usar los hardcodeados
-    const productosGuardados = JSON.parse(localStorage.getItem('productos'));
-    if (productosGuardados && productosGuardados.length > 0) {
-      // Si no existe el producto arroz integral, lo agregamos
-      const existeArroz = productosGuardados.some(p => p.id === 1);
-      if (!existeArroz) {
-        productosGuardados.unshift({
-          id: 1,
-          nombre: 'Arroz Integral',
-          precio: 1290,
-          imagen: 'https://th.bing.com/th/id/R.4b9c664985f7327c573b54ba819ef489?rik=tI99qU8y0Ut%2bnw&pid=ImgRaw&r=0',
-          descripcion: 'Arroz integral 1kg, marca Villa Markets',
-          categoria: 'abarrotes',
-          stock: 15,
-          minimarket: 'Villa Central'
-        });
-        localStorage.setItem('productos', JSON.stringify(productosGuardados));
+    // Intentar obtener productos del backend
+    const cargarProductos = async () => {
+      try {
+        const productosBackend = await productoService.destacados();
+        if (productosBackend && productosBackend.length > 0) {
+          setProductos(productosBackend);
+          localStorage.setItem('productos', JSON.stringify(productosBackend));
+          return;
+        }
+      } catch (err) {
+        console.warn('Error al obtener productos del backend:', err?.message || err);
       }
-      setProductos(productosGuardados);
-    } else {
-      setProductos([
+
+      // Fallback: leer productos desde localStorage o usar hardcodeados
+      const productosGuardados = JSON.parse(localStorage.getItem('productos'));
+      if (productosGuardados && productosGuardados.length > 0) {
+        const existeArroz = productosGuardados.some(p => p.id === 1);
+        if (!existeArroz) {
+          productosGuardados.unshift({
+            id: 1,
+            nombre: 'Arroz Integral',
+            precio: 1290,
+            imagen: 'https://th.bing.com/th/id/R.4b9c664985f7327c573b54ba819ef489?rik=tI99qU8y0Ut%2bnw&pid=ImgRaw&r=0',
+            descripcion: 'Arroz integral 1kg, marca Villa Markets',
+            categoria: 'abarrotes',
+            stock: 15,
+            minimarket: 'Villa Central'
+          });
+          localStorage.setItem('productos', JSON.stringify(productosGuardados));
+        }
+        setProductos(productosGuardados);
+      } else {
+        setProductos([
         {
           id: 1,
           nombre: 'Arroz Integral',
@@ -173,10 +187,30 @@ const Producto = () => {
           minimarket: 'Villa Central'
         }
       ]);
-    }
+      }
+    };
+    cargarProductos();
   }, []);
 
-  const agregarAlCarrito = (producto) => {
+  const agregarAlCarrito = async (producto) => {
+    const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+    
+    // Si hay usuario logueado, intentar agregar al carrito del servidor
+    if (usuarioActual && localStorage.getItem('authToken')) {
+      try {
+        await carritoService.agregarItem({
+          productoId: producto.id,
+          cantidad: 1,
+          precio: producto.precio,
+          nombre: producto.nombre
+        });
+        console.log('Producto agregado al carrito del servidor');
+      } catch (err) {
+        console.warn('Error al agregar al carrito del servidor, usando fallback local:', err?.message || err);
+      }
+    }
+
+    // Fallback: siempre guardar en localStorage también
     setCarrito(prev => {
       const existe = prev.find(p => p.id === producto.id);
       let nuevoCarrito;

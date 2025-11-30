@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "bootstrap/dist/js/bootstrap.bundle.min.js"; // para tooltips si los usas
+import registroService from "../../services/registroService";
 
 // --- Utilidades RUT (módulo 11) ---
 function validarRut(raw) {
@@ -72,6 +73,7 @@ export default function Registro() {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // Inicializar tooltips si usas data-bs-toggle
   useEffect(() => {
@@ -143,7 +145,7 @@ export default function Registro() {
   };
 
   // Manejar envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const eMap = validate();
     setErrors(eMap);
@@ -162,47 +164,37 @@ export default function Registro() {
 
     if (Object.keys(eMap).length > 0) return;
 
-    // Construir usuario simulado
-    const nuevoUsuario = {
-      nombre: form.nombre.trim(),
+    setIsLoading(true);
+
+    // Construir datos para enviar al backend
+    const datosRegistro = {
+      nombres: form.nombre.trim(),
       apellidos: form.apellidos.trim(),
       rut: formatearRut(form.rut),
-      email: form.correo.trim(),
       correo: form.correo.trim(),
       direccion: form.direccion.trim(),
       telefono: form.telefono.trim(),
-      dieta: form.dieta,
       password: form.password,
-      clave: form.password,
-      usuario: form.correo.split('@')[0],
-      tipoUsuario: form.tipoUsuario,
-      rol: form.tipoUsuario,
-      // Incluir datos del minimarket si es admin
-      ...(form.tipoUsuario === "admin" && {
-        minimarket: {
-          nombre: form.nombreMinimarket.trim(),
-          direccion: form.direccionMinimarket.trim(),
-          descripcion: form.descripcionMinimarket.trim(),
-          horarios: form.horariosAtencion,
-          estado: 'pendiente' // El admin del sistema debe aprobar el minimarket
-        }
-      })
+      username: form.correo.split('@')[0], // usar parte del email como username
+      rol: form.tipoUsuario // "cliente" o "admin"
     };
 
-    // Persistencia simulada
-    localStorage.setItem("usuarioActual", JSON.stringify(nuevoUsuario));
-    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-    usuarios.push(nuevoUsuario);
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    try {
+      // Enviar datos al backend
+      const response = await registroService.registrar(datosRegistro);
+      
+      // Guardar token si el backend lo devuelve (opcional)
+      if (response.token) {
+        localStorage.setItem('authToken', response.token);
+      }
 
-    // SweetAlert2 (CDN) o fallback a alert
-    const done = () =>
-      navigate("/", { replace: true }); // redirige al Home (ajusta ruta si es necesario)
+      // Mostrar mensaje de éxito y redirigir al login
+      const done = () => navigate("/login", { replace: true });
 
       if (window.Swal) {
         const mensajeAdmin = form.tipoUsuario === "admin" 
           ? "Tu solicitud será revisada por nuestro equipo. Te notificaremos cuando tu cuenta sea aprobada."
-          : "Tu cuenta ha sido creada correctamente.";
+          : "Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión.";
 
         window.Swal.fire({
           icon: "success",
@@ -210,9 +202,31 @@ export default function Registro() {
           text: `Bienvenido a Villa Markets. ${mensajeAdmin}`,
           confirmButtonColor: "#2d8f3c",
         }).then(done);
-    } else {
-      alert("¡Registro exitoso!");
-      done();
+      } else {
+        alert("¡Registro exitoso! Ahora inicia sesión.");
+        done();
+      }
+    } catch (error) {
+      // Mostrar error al usuario
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          "Error al registrarse. Intenta de nuevo.";
+      
+      setErrors({ form: errorMessage });
+
+      if (window.Swal) {
+        window.Swal.fire({
+          icon: "error",
+          title: "Error en el registro",
+          text: errorMessage,
+          confirmButtonColor: "#dc3545",
+        });
+      } else {
+        alert(`Error: ${errorMessage}`);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -237,72 +251,7 @@ export default function Registro() {
         </p>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const eMap = validate();
-            setErrors(eMap);
-            setTouched({
-              nombre: true,
-              apellidos: true,
-              rut: true,
-              correo: true,
-              confirmarCorreo: true,
-              direccion: true,
-              telefono: true,
-              password: true,
-              confirmarPassword: true,
-              terminos: true,
-            });
-            if (Object.keys(eMap).length > 0) return;
-
-            // Construir usuario simulado (misma lógica que handleSubmit pero redirige a /login)
-            const nuevoUsuario = {
-              nombre: form.nombre.trim(),
-              apellidos: form.apellidos.trim(),
-              rut: formatearRut(form.rut),
-              email: form.correo.trim(),
-              direccion: form.direccion.trim(),
-              telefono: form.telefono.trim(),
-              dieta: form.dieta,
-              password: form.password,
-              rol: form.tipoUsuario,
-              ...(form.tipoUsuario === "admin" && {
-                minimarket: {
-                  nombre: form.nombreMinimarket.trim(),
-                  direccion: form.direccionMinimarket.trim(),
-                  descripcion: form.descripcionMinimarket.trim(),
-                  horarios: form.horariosAtencion,
-                  estado: "pendiente",
-                },
-              }),
-            };
-
-            localStorage.setItem("usuarioActual", JSON.stringify(nuevoUsuario));
-            const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-            usuarios.push(nuevoUsuario);
-            localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-            const done = () => navigate("/login", { replace: true }); // <- redirige a Login.jsx
-
-            if (window.Swal) {
-              const mensajeAdmin =
-                form.tipoUsuario === "admin"
-                  ? "Tu solicitud será revisada por nuestro equipo. Te notificaremos cuando tu cuenta sea aprobada."
-                  : "Tu cuenta ha sido creada correctamente.";
-
-              window.Swal
-                .fire({
-                  icon: "success",
-                  title: "¡Registro exitoso!",
-                  text: `Bienvenido a Villa Markets. ${mensajeAdmin}`,
-                  confirmButtonColor: "#2d8f3c",
-                })
-                .then(done);
-            } else {
-              alert("¡Registro exitoso!");
-              done();
-            }
-          }}
+          onSubmit={handleSubmit}
           noValidate
         >
           {/* Selector de tipo de usuario */}
@@ -563,8 +512,8 @@ export default function Registro() {
             {feedback("terminos")}
           </div>
 
-          <button type="submit" className="btn btn-green btn-lg w-100">
-            Registrarse
+          <button type="submit" className="btn btn-green btn-lg w-100" disabled={isLoading}>
+            {isLoading ? "Registrando..." : "Registrarse"}
           </button>
         </form>
 

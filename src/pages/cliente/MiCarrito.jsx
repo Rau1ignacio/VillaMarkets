@@ -3,6 +3,8 @@ import MetodoPago from './MetodoPago';
 import Producto from './Producto';
 
 import { Link, useNavigate } from 'react-router-dom';
+import carritoService from '../../services/carritoService';
+import pedidoService from '../../services/pedidoService';
 
 const ENVIO_COSTO = 2990;
 const IVA_PORCENTAJE = 0.19;
@@ -25,8 +27,29 @@ const MiCarrito = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    const carritoGuardado = JSON.parse(localStorage.getItem('carrito')) || [];
-    setCarrito(carritoGuardado);
+    // Intentar cargar carrito del servidor
+    const cargarCarrito = async () => {
+      const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+      const authToken = localStorage.getItem('authToken');
+      
+      if (usuarioActual && authToken) {
+        try {
+          const carritoServidor = await carritoService.obtener();
+          if (carritoServidor && carritoServidor.items) {
+            setCarrito(carritoServidor.items);
+            return;
+          }
+        } catch (err) {
+          console.warn('Error al cargar carrito del servidor, usando localStorage:', err?.message || err);
+        }
+      }
+
+      // Fallback: cargar desde localStorage
+      const carritoGuardado = JSON.parse(localStorage.getItem('carrito')) || [];
+      setCarrito(carritoGuardado);
+    };
+
+    cargarCarrito();
   }, []);
 
   const calcularSubtotal = () => carrito.reduce((acc, prod) => acc + prod.precio * prod.cantidad, 0);
@@ -42,24 +65,14 @@ const MiCarrito = () => {
   // const aplicarDescuento = () => {};
 
   const descontarStock = async () => {
-    for (const prod of carrito) {
-      await fetch(`https://api.tuapp.com/productos/${prod.id}/descontar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cantidad: prod.cantidad })
-      });
-    }
-  };
-
-  const finalizarCompra = () => {
-    if (carrito.length === 0) {
-      setMensaje('El carrito está vacío.');
-      return;
-    }
-    setMostrarMetodoPago(true);
+    // La lógica de descontar stock ahora está en el backend (pedidoService.crear)
+    console.log('Stock será descontado automáticamente en el servidor al crear el pedido');
   };
 
   const handleConfirmarPago = async (datosPago) => {
+    const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+    const authToken = localStorage.getItem('authToken');
+    
     const productosComprados = carrito.map(prod => ({ ...prod }));
     const subtotal = calcularSubtotal();
     const ivaCalculado = calcularIVA(subtotal);
@@ -67,34 +80,84 @@ const MiCarrito = () => {
     const totalCalculado = subtotal + ivaCalculado + envioCalculado - descuento;
 
     let estadoPedido = 'Procesando';
-    let mensajeUsuario = '¡Compra realizada y stock actualizado!';
+    let mensajeUsuario = '¡Compra realizada!';
 
-    try {
-      await descontarStock();
-    } catch (error) {
-      console.error('Error al descontar stock remoto:', error);
-      estadoPedido = 'Pendiente de confirmación';
-      mensajeUsuario = 'No se pudo actualizar el stock remoto, pero tu pedido quedó guardado en el historial.';
+    // Si hay usuario y token, intentar crear pedido en servidor
+    if (usuarioActual && authToken) {
+      try {
+        const respuesta = await pedidoService.crear({
+          usuarioId: usuarioActual.id || usuarioActual.usuario,
+          items: productosComprados,
+          subtotal,
+          iva: ivaCalculado,
+          envio: envioCalculado,
+          descuento,
+          total: totalCalculado,
+          metodoPago: datosPago.metodoPago || 'Pago en línea',
+          direccion: datosPago.direccion || '',
+          estado: 'Procesando'
+        });
+        
+        if (respuesta && respuesta.id) {
+          estadoPedido = 'Confirmado en servidor';
+          mensajeUsuario = '¡Compra realizada y confirmada en el servidor!';
+          // Guardar en localStorage también como respaldo
+          const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
+          const ahora = new Date();
+          const nuevoPedido = {
+            id: respuesta.id,
+            fecha: ahora.toLocaleDateString(),
+            hora: ahora.toLocaleTimeString(),
+            total: totalCalculado,
+            estado: estadoPedido,
+            metodoPago: datosPago.metodoPago || 'Pago en línea',
+            direccion: datosPago.direccion || '',
+            descuento,
+            envio: envioCalculado,
+            iva: ivaCalculado,
+            productos: productosComprados,
+            nombreCliente: datosPago.nombre || usuarioActual.usuario || '',
+            datosPago
+          };
+          pedidosGuardados.push(nuevoPedido);
+          localStorage.setItem('misPedidos', JSON.stringify(pedidosGuardados));
+        }
+      } catch (err) {
+        console.warn('Error al crear pedido en servidor, guardando solo en localStorage:', err?.message || err);
+        estadoPedido = 'Guardado localmente';
+        mensajeUsuario = 'Tu pedido fue guardado localmente (el servidor no respondió).';
+      }
+    } else {
+      // Fallback: guardar solo en localStorage
+      const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
+      const ahora = new Date();
+      const nuevoPedido = {
+        fecha: ahora.toLocaleDateString(),
+        hora: ahora.toLocaleTimeString(),
+        total: totalCalculado,
+        estado: estadoPedido,
+        metodoPago: datosPago.metodoPago || 'Pago en línea',
+        direccion: datosPago.direccion || '',
+        descuento,
+        envio: envioCalculado,
+        iva: ivaCalculado,
+        productos: productosComprados,
+        nombreCliente: datosPago.nombre || '',
+        datosPago
+      };
+      pedidosGuardados.push(nuevoPedido);
+      localStorage.setItem('misPedidos', JSON.stringify(pedidosGuardados));
     }
 
-    const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
-    const ahora = new Date();
-    const nuevoPedido = {
-      fecha: ahora.toLocaleDateString(),
-      hora: ahora.toLocaleTimeString(),
-      total: totalCalculado,
-      estado: estadoPedido,
-      metodoPago: 'Pago en línea',
-      direccion: '',
-      descuento,
-      envio: envioCalculado,
-      iva: ivaCalculado,
-      productos: productosComprados,
-      nombreCliente: datosPago.nombre || '',
-      datosPago
-    };
-    pedidosGuardados.push(nuevoPedido);
-    localStorage.setItem('misPedidos', JSON.stringify(pedidosGuardados));
+    // Limpiar carrito (servidor + localStorage)
+    if (usuarioActual && authToken) {
+      try {
+        await carritoService.limpiar();
+      } catch (err) {
+        console.warn('Error al limpiar carrito en servidor:', err?.message || err);
+      }
+    }
+
     setCarrito([]);
     localStorage.removeItem('carrito');
     setMensaje(mensajeUsuario);
@@ -110,9 +173,21 @@ const MiCarrito = () => {
   };
 
   // CRUD: Eliminar producto del carrito
-  const eliminarProducto = (id) => {
-    // Confirmación visual antes de eliminar
+  const eliminarProducto = async (id) => {
     if (window.confirm('¿Seguro que deseas eliminar este producto del carrito?')) {
+      const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+      const authToken = localStorage.getItem('authToken');
+
+      // Intentar eliminar del servidor
+      if (usuarioActual && authToken) {
+        try {
+          await carritoService.eliminarItem(id);
+        } catch (err) {
+          console.warn('Error al eliminar del carrito del servidor:', err?.message || err);
+        }
+      }
+
+      // Eliminar del carrito local (siempre)
       const nuevoCarrito = carrito.filter(p => p.id !== id);
       setCarrito(nuevoCarrito);
       localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
@@ -121,13 +196,34 @@ const MiCarrito = () => {
   };
 
   // CRUD: Modificar cantidad de producto
-  const modificarCantidad = (id, cantidad) => {
+  const modificarCantidad = async (id, cantidad) => {
     if (cantidad < 1) return;
+    
     const nuevoCarrito = carrito.map(p =>
       p.id === id ? { ...p, cantidad } : p
     );
     setCarrito(nuevoCarrito);
     localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
+    
+    // Intentar actualizar en servidor (opcional)
+    const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+    const authToken = localStorage.getItem('authToken');
+    if (usuarioActual && authToken) {
+      try {
+        const prod = carrito.find(p => p.id === id);
+        if (prod) {
+          await carritoService.agregarItem({
+            productoId: id,
+            cantidad: cantidad - prod.cantidad, // diferencia
+            precio: prod.precio,
+            nombre: prod.nombre
+          });
+        }
+      } catch (err) {
+        console.warn('Error al actualizar cantidad en servidor:', err?.message || err);
+      }
+    }
+    
     setMensaje('Cantidad modificada correctamente.');
   };
 

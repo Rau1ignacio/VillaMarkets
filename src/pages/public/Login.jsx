@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import usuarioService from '../../services/usuarioService';
 
 /* Para demo (admin/admin123, cliente1/cliente123) */
 function seedUsuarios() {
@@ -29,11 +30,53 @@ export default function Login() {
 
   useEffect(() => { seedUsuarios(); }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     setLoading(true);
 
+    // Primero intentar login contra backend
+    try {
+      const resp = await usuarioService.login({ username, password });
+      // resp puede venir con varias formas: { token, usuario } o { authToken, user }
+      const token = resp?.token || resp?.authToken || resp?.accessToken || null;
+      const user = resp?.usuario || resp?.user || resp?.usuarioActual || (resp && !token ? resp : null);
+
+      if (token) localStorage.setItem('authToken', token);
+      if (user) {
+        // normalizar campos mínimos
+        if (!user.email && user.correo) user.email = user.correo;
+        if (!user.correo && user.email) user.correo = user.email;
+        if (user.tipoUsuario === "admin") user.rol = "admin";
+        else if (user.tipoUsuario === "cliente") user.rol = "cliente";
+        else if (user.rol === "administrador") user.rol = "admin";
+
+        localStorage.setItem('usuarioActual', JSON.stringify(user));
+      }
+
+      setLoading(false);
+      const finalUser = user || (token ? null : null);
+
+      // Si recibimos rol desde backend lo usamos, sino intentamos redirigir por defecto al home
+      if (finalUser && (finalUser.tipoUsuario === 'admin' || finalUser.rol === 'admin')) {
+        navigate('/admin', { replace: true });
+      } else if (finalUser && (finalUser.tipoUsuario === 'cliente' || finalUser.rol === 'cliente')) {
+        navigate('/clienteinicio', { replace: true });
+      } else {
+        // Si no tenemos user pero sí token, redirigimos a cliente por defecto
+        if (token) navigate('/clienteinicio', { replace: true });
+        else navigate('/', { replace: true });
+      }
+
+      return;
+    } catch (err) {
+      console.warn('Login backend falló, intentando fallback local:', err?.message || err);
+      // continuar con fallback local
+    } finally {
+      setLoading(false);
+    }
+
+    // Fallback: verificar usuarios en localStorage (demo)
     const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
     const user = usuarios.find(u => {
       const matchUser = [u.usuario, u.email, u.correo].includes(username);
@@ -41,40 +84,30 @@ export default function Login() {
       return matchUser && matchPass;
     });
 
-    setTimeout(() => {
-      setLoading(false);
-      if (!user) { 
-        setErrorMsg("Usuario o contraseña incorrectos."); 
-        return; 
-      }
+    if (!user) {
+      setErrorMsg("Usuario o contraseña incorrectos.");
+      return;
+    }
 
-      // Normalizar datos del usuario
-      if (!user.email && user.correo) user.email = user.correo;
-      if (!user.correo && user.email) user.correo = user.email;
-      if (user.tipoUsuario === "admin") user.rol = "admin";
-      else if (user.tipoUsuario === "cliente") user.rol = "cliente";
-      else if (user.rol === "administrador") user.rol = "admin";
+    // Normalizar datos del usuario
+    if (!user.email && user.correo) user.email = user.correo;
+    if (!user.correo && user.email) user.correo = user.email;
+    if (user.tipoUsuario === "admin") user.rol = "admin";
+    else if (user.tipoUsuario === "cliente") user.rol = "cliente";
+    else if (user.rol === "administrador") user.rol = "admin";
 
-      // Guardar usuario actual en localStorage
-      localStorage.setItem("usuarioActual", JSON.stringify(user));
+    // Guardar usuario actual en localStorage
+    localStorage.setItem("usuarioActual", JSON.stringify(user));
+    setLoading(false);
 
-      // Debug: mostrar información del usuario
-      console.log("Usuario logueado:", user);
-      console.log("Tipo de usuario:", user.tipoUsuario);
-      console.log("Rol del usuario:", user.rol);
-
-      // Redireccionar según el rol del usuario
-      if (user.tipoUsuario === "admin" || user.rol === "admin") {
-        console.log("Redirigiendo a /admin");
-        navigate("/admin", { replace: true });
-      } else if (user.tipoUsuario === "cliente" || user.rol === "cliente") {
-        console.log("Redirigiendo a /clienteinicio");
-        navigate("/clienteinicio", { replace: true });
-      } else {
-        console.log("Rol no reconocido, redirigiendo a /");
-        navigate("/", { replace: true });
-      }
-    }, 500); // micro delay para animación
+    // Redireccionar según el rol del usuario
+    if (user.tipoUsuario === "admin" || user.rol === "admin") {
+      navigate("/admin", { replace: true });
+    } else if (user.tipoUsuario === "cliente" || user.rol === "cliente") {
+      navigate("/clienteinicio", { replace: true });
+    } else {
+      navigate("/", { replace: true });
+    }
   };
 
 
