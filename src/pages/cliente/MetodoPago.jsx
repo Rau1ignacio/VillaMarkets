@@ -4,21 +4,19 @@ const MetodoPago = ({ total, onConfirmar }) => {
   const [nombre, setNombre] = useState('');
   const [numero, setNumero] = useState('');
   const [correo, setCorreo] = useState('');
-  const [comprobante, setComprobante] = useState(null);
   const [confirmado, setConfirmado] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setConfirmado(true);
-    if (onConfirmar) onConfirmar({ nombre, numero, correo, comprobante });
+    if (onConfirmar) onConfirmar({ nombre, numero, correo });
   };
-  
+
 
   if (confirmado) {
     return (
       <div style={{ background: '#d4edda', padding: 20, borderRadius: 10 }}>
         <h4>¡Pago confirmado!</h4>
-        <p>El comprobante será enviado a: <b>{correo}</b></p>
       </div>
     );
   }
@@ -37,10 +35,6 @@ const MetodoPago = ({ total, onConfirmar }) => {
       <div className="mb-3">
         <label>Correo electrónico</label>
         <input type="email" className="form-control" value={correo} onChange={e => setCorreo(e.target.value)} required />
-      </div>
-      <div className="mb-3">
-        <label>Subir comprobante (opcional)</label>
-        <input type="file" className="form-control" onChange={e => setComprobante(e.target.files[0])} />
       </div>
       <div className="mb-3">
         <b>Total a pagar: CLP ${total}</b>

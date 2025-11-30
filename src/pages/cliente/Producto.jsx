@@ -32,177 +32,48 @@ const Producto = () => {
   const [productoAnimado, setProductoAnimado] = useState(null);
   const animacionTimeoutRef = useRef(null);
 
+  // 🔹 Cargar productos del backend al montar
   useEffect(() => {
-    // Intentar obtener productos del backend
     const cargarProductos = async () => {
       try {
-        const productosBackend = await productoService.destacados();
-        if (productosBackend && productosBackend.length > 0) {
-          setProductos(productosBackend);
-          localStorage.setItem('productos', JSON.stringify(productosBackend));
-          return;
-        }
-      } catch (err) {
-        console.warn('Error al obtener productos del backend:', err?.message || err);
-      }
+        const productosBackend = await productoService.listar(); // GET /v1/productos
 
-      // Fallback: leer productos desde localStorage o usar hardcodeados
-      const productosGuardados = JSON.parse(localStorage.getItem('productos'));
-      if (productosGuardados && productosGuardados.length > 0) {
-        const existeArroz = productosGuardados.some(p => p.id === 1);
-        if (!existeArroz) {
-          productosGuardados.unshift({
-            id: 1,
-            nombre: 'Arroz Integral',
-            precio: 1290,
-            imagen: 'https://th.bing.com/th/id/R.4b9c664985f7327c573b54ba819ef489?rik=tI99qU8y0Ut%2bnw&pid=ImgRaw&r=0',
-            descripcion: 'Arroz integral 1kg, marca Villa Markets',
-            categoria: 'abarrotes',
-            stock: 15,
-            minimarket: 'Villa Central'
-          });
-          localStorage.setItem('productos', JSON.stringify(productosGuardados));
-        }
+        // Normalizar al formato que usa el catálogo
+        const normalizados = productosBackend.map(p => ({
+          id: p.id,
+          nombre: p.nombre,
+          precio: Number(p.precio),        // BigDecimal -> number
+          imagen: p.imagen || '',          // en tu DTO se llama "imagen"
+          descripcion: p.descripcion || '',
+          categoria: p.categoria || 'otros',
+          stock: p.stock ?? 0,
+          minimarket: p.tiendaId ? `Tienda #${p.tiendaId}` : 'Sin tienda'
+        }));
+
+        setProductos(normalizados);
+        localStorage.setItem('productos', JSON.stringify(normalizados));
+      } catch (err) {
+        console.warn('Error al obtener productos del backend, usando fallback local:', err?.message || err);
+
+        const productosGuardados = JSON.parse(localStorage.getItem('productos') || '[]');
         setProductos(productosGuardados);
-      } else {
-        setProductos([
-        {
-          id: 1,
-          nombre: 'Arroz Integral',
-          precio: 1290,
-          imagen: 'https://th.bing.com/th/id/R.4b9c664985f7327c573b54ba819ef489?rik=tI99qU8y0Ut%2bnw&pid=ImgRaw&r=0',
-          descripcion: 'Arroz integral 1kg, marca Villa Markets',
-          categoria: 'abarrotes',
-          stock: 15,
-          minimarket: 'Villa Central'
-        },
-        {
-          id: 2,
-          nombre: 'Leche Descremada',
-          precio: 990,
-          imagen: 'leche.jpg',
-          descripcion: 'Leche descremada 1L, marca Villa Markets',
-          categoria: 'lacteos',
-          stock: 25,
-          minimarket: 'Villa Norte'
-        },
-        {
-          id: 3,
-          nombre: 'Pan Integral',
-          precio: 1590,
-          imagen: 'pan.jpg',
-          descripcion: 'Pan integral 500g, marca Villa Markets',
-          categoria: 'panaderia',
-          stock: 8,
-          minimarket: 'Villa Central'
-        },
-        {
-          id: 4,
-          nombre: 'Huevos Orgánicos',
-          precio: 2990,
-          imagen: 'huevos.jpg',
-          descripcion: 'Huevos orgánicos x6, marca Villa Markets',
-          categoria: 'lacteos',
-          stock: 12,
-          minimarket: 'Villa Este'
-        },
-        {
-          id: 5,
-          nombre: 'Aceite de Oliva',
-          precio: 5990,
-          imagen: 'aceite.jpg',
-          descripcion: 'Aceite de oliva extra virgen 500ml, marca Villa Markets',
-          categoria: 'abarrotes',
-          stock: 5,
-          minimarket: 'Villa Sur'
-        },
-        {
-          id: 6,
-          nombre: 'Manzanas',
-          precio: 1990,
-          imagen: 'manzanas.jpg',
-          descripcion: 'Manzanas rojas 1kg, producción local',
-          categoria: 'frutas',
-          stock: 30,
-          minimarket: 'Villa Norte'
-        },
-        {
-          id: 7,
-          nombre: 'Detergente',
-          precio: 3490,
-          imagen: 'detergente.jpg',
-          descripcion: 'Detergente líquido 1L, marca Villa Clean',
-          categoria: 'limpieza',
-          stock: 18,
-          minimarket: 'Villa Este'
-        },
-        {
-          id: 8,
-          nombre: 'Jugo Natural',
-          precio: 1990,
-          imagen: 'jugo.jpg',
-          descripcion: 'Jugo natural de naranja 1L, sin azúcar añadida',
-          categoria: 'bebidas',
-          stock: 0,
-          minimarket: 'Villa Sur'
-        },
-        {
-          id: 9,
-          nombre: 'Café Orgánico',
-          precio: 4590,
-          imagen: 'cafe.jpg',
-          descripcion: 'Café orgánico tostado 250g, comercio justo',
-          categoria: 'abarrotes',
-          stock: 7,
-          minimarket: 'Villa Norte'
-        },
-        {
-          id: 10,
-          nombre: 'Avena',
-          precio: 1790,
-          imagen: 'avena.jpg',
-          descripcion: 'Avena tradicional 500g, rica en fibra',
-          categoria: 'abarrotes',
-          stock: 20,
-          minimarket: 'Villa Central'
-        },
-        {
-          id: 11,
-          nombre: 'Agua Mineral',
-          precio: 890,
-          imagen: 'agua.jpg',
-          descripcion: 'Agua mineral sin gas 1.5L',
-          categoria: 'bebidas',
-          stock: 48,
-          minimarket: 'Villa Este'
-        },
-        {
-          id: 12,
-          nombre: 'Yogurt Griego',
-          precio: 1290,
-          imagen: 'yogurt.jpg',
-          descripcion: 'Yogurt griego natural 200g, alto en proteínas',
-          categoria: 'lacteos',
-          stock: 15,
-          minimarket: 'Villa Central'
-        }
-      ]);
       }
     };
+
     cargarProductos();
   }, []);
 
+  // 🔹 Agregar al carrito (backend + fallback localStorage)
   const agregarAlCarrito = async (producto) => {
     const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
-    
-    // Si hay usuario logueado, intentar agregar al carrito del servidor
+
+    // Si hay usuario logueado, usamos el carrito real del backend
     if (usuarioActual && localStorage.getItem('authToken')) {
       try {
-        await carritoService.agregarItem({
+        await carritoService.agregarItem(usuarioActual.id, {
           productoId: producto.id,
           cantidad: 1,
-          precio: producto.precio,
-          nombre: producto.nombre
+          precioUnitario: producto.precio   // el backend espera "precioUnitario"
         });
         console.log('Producto agregado al carrito del servidor');
       } catch (err) {
@@ -210,7 +81,7 @@ const Producto = () => {
       }
     }
 
-    // Fallback: siempre guardar en localStorage también
+    // Fallback/local: mantener también en localStorage
     setCarrito(prev => {
       const existe = prev.find(p => p.id === producto.id);
       let nuevoCarrito;
@@ -221,7 +92,6 @@ const Producto = () => {
             : p
         );
       } else {
-        // Aseguramos que el producto tenga todos los campos necesarios
         nuevoCarrito = [...prev, {
           id: producto.id,
           nombre: producto.nombre,
@@ -237,16 +107,13 @@ const Producto = () => {
       localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
       return nuevoCarrito;
     });
+
     setProductoAnimado(producto.id);
     if (animacionTimeoutRef.current) clearTimeout(animacionTimeoutRef.current);
     animacionTimeoutRef.current = setTimeout(() => {
       setProductoAnimado(null);
     }, 500);
   };
-
-  useEffect(() => {
-    // El almacenamiento en localStorage ahora se realiza directamente en agregarAlCarrito
-  }, [carrito]);
 
   useEffect(() => {
     return () => {
@@ -256,11 +123,12 @@ const Producto = () => {
     };
   }, []);
 
-  // Filtros y orden
+  // 🔹 Filtros y orden
   const filtrarProductos = () => {
     let filtrados = [...productos];
+
     if (categoria !== 'todos') {
-      filtrados = filtrados.filter(p => p.categoria === categoria);
+      filtrados = filtrados.filter(p => (p.categoria || '').toLowerCase() === categoria.toLowerCase());
     }
     if (stockFiltro === 'disponible') {
       filtrados = filtrados.filter(p => p.stock > 0);
@@ -269,11 +137,12 @@ const Producto = () => {
       const b = busqueda.toLowerCase();
       filtrados = filtrados.filter(p =>
         p.nombre.toLowerCase().includes(b) ||
-        p.descripcion.toLowerCase().includes(b) ||
-        p.categoria.toLowerCase().includes(b) ||
-        (p.minimarket && p.minimarket.toLowerCase().includes(b))
+        (p.descripcion || '').toLowerCase().includes(b) ||
+        (p.categoria || '').toLowerCase().includes(b) ||
+        (p.minimarket || '').toLowerCase().includes(b)
       );
     }
+
     switch (orden) {
       case 'nombre':
         filtrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
@@ -290,6 +159,7 @@ const Producto = () => {
       default:
         break;
     }
+
     return filtrados;
   };
 
@@ -298,6 +168,7 @@ const Producto = () => {
   return (
     <div className="container py-4">
       <h1 className="text-green mb-4">Catálogo de Productos</h1>
+
       {/* Filtros */}
       <div className="filter-section mb-4 p-3 rounded bg-light">
         <div className="row">
@@ -326,10 +197,17 @@ const Producto = () => {
           </div>
           <div className="col-md-3 mb-3">
             <label className="form-label">Buscar</label>
-            <input type="text" className="form-control" placeholder="Buscar productos..." value={busqueda} onChange={e => setBusqueda(e.target.value)} />
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Buscar productos..."
+              value={busqueda}
+              onChange={e => setBusqueda(e.target.value)}
+            />
           </div>
         </div>
       </div>
+
       {/* Catálogo */}
       <div className="row" id="productos-container">
         {productosAMostrar.length === 0 ? (
@@ -364,7 +242,7 @@ const Producto = () => {
                   <h5 className="card-title">{prod.nombre}</h5>
                   <p className="card-text text-muted small">{prod.descripcion}</p>
                   <p className="card-text text-muted small mb-3">
-                    <i className="fas fa-store-alt me-1"></i> {prod.minimarket || 'Todos los minimarkets'}
+                    <i className="fas fa-store-alt me-1"></i> {prod.minimarket || 'Tienda no especificada'}
                   </p>
                   <div className="d-flex justify-content-between align-items-center">
                     <span className="fw-bold text-green">CLP ${prod.precio.toLocaleString('es-CL')}</span>

@@ -4,7 +4,7 @@ import '../../styles/ClienteInicio.css';
 
 // --- Datos Constantes ---
 const OFERTAS_DESTACADAS = [
-// De momento no hemos puesto ofertas verdaderas
+  // De momento no hemos puesto ofertas verdaderas
   {
     titulo: "2x1 en Frutas y Verduras",
     tienda: "Minimarket El Barrio",
@@ -26,7 +26,7 @@ const OFERTAS_DESTACADAS = [
 ];
 
 const ESTADISTICAS_USUARIO = [
-// De momento no hemos puesto estadisticas verdaderas
+  // De momento no hemos puesto estadisticas verdaderas
   {
     titulo: "Compras Realizadas",
     valor: "12",
@@ -48,7 +48,7 @@ const ESTADISTICAS_USUARIO = [
 ];
 
 const ACCESOS_RAPIDOS = [
-// De momento no hemos puesto estadisticas verdaderas
+  // De momento no hemos puesto estadisticas verdaderas
   {
     titulo: "Productos",
     descripcion: "Explora nuestro cat├ílogo completo",
@@ -79,20 +79,20 @@ const ACCESOS_RAPIDOS = [
 /* Componente de Hoja de Estilos */
 const CustomStyles = () => (
   <Fragment>
-    
-    <link 
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
-      rel="stylesheet" 
-      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
-      crossOrigin="anonymous" 
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossOrigin="anonymous"
     />
-    
-    <link 
-      rel="stylesheet" 
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
-      xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
-      crossOrigin="anonymous" 
-      referrerPolicy="no-referrer" 
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossOrigin="anonymous"
+      referrerPolicy="no-referrer"
     />
     {/* Añadimos los estilos personalizados aqui */}
   </Fragment>
@@ -101,20 +101,20 @@ const CustomStyles = () => (
 // --- Componente Principal ---
 const ClienteInicio = () => {
   const navigate = useNavigate();
-  const location = useLocation(); 
-  
+  const location = useLocation();
+
   // Usar useState para el usuario.
   const [usuario, setUsuario] = useState(null);
 
   // --- L├│gica del Usuario (de tu c├│digo original) ---
   useEffect(() => {
-        if (location?.state?.openNearest) {
-            // esperar que mapa estainicializado
-             const t = setTimeout(() => {
-              console.log("Buscando minimarket cercano (simulado)...");
-              encontrarCercano(); 
-            }, 500);
-            return () => clearTimeout(t);
+    if (location?.state?.openNearest) {
+      // esperar que mapa estainicializado
+      const t = setTimeout(() => {
+        console.log("Buscando minimarket cercano (simulado)...");
+        encontrarCercano();
+      }, 500);
+      return () => clearTimeout(t);
     }
   }, [location?.state?.openNearest]); // Dependencia original
 
@@ -122,35 +122,35 @@ const ClienteInicio = () => {
   useEffect(() => {
     try {
       // Sincronizado con tu handleLogout (usa 'usuario')
-      const usuarioGuardado = localStorage.getItem('usuario'); 
+      const usuarioGuardado = localStorage.getItem('usuario');
       setUsuario(usuarioGuardado ? JSON.parse(usuarioGuardado) : {});
     } catch (error) {
       console.error("Error al parsear datos del usuario:", error);
       setUsuario({}); // Establecer un objeto vacio en caso de error
     }
-  }, []); 
+  }, []);
 
   // --- Manejadores de Navegacion (con tus rutas) ---
-  
+
   const handleLogout = useCallback(() => {
-     localStorage.removeItem('usuario'); // Tu l├│gica
-     navigate('/login'); 
+    localStorage.removeItem('usuario'); // Tu l├│gica
+    navigate('/login');
   }, [navigate]);
 
   const handleMinimarket = useCallback(() => {
-        navigate('./Minimarket', { state: { openNearest: true } }); 
+    navigate('./Minimarket', { state: { openNearest: true } });
   }, [navigate]);
 
   const handlePerfil = useCallback(() => {
-        navigate('./Perfil'); 
+    navigate('./Perfil');
   }, [navigate]);
 
   const handleMiCarrito = useCallback(() => {
-        navigate('./micarrito'); 
+    navigate('./micarrito');
   }, [navigate]);
 
   const handleProductos = useCallback(() => {
-        navigate('./producto'); 
+    navigate('./producto');
   }, [navigate]);
 
   // Mapear los handlers a un objeto para un acceso m├ís limpio
@@ -177,7 +177,7 @@ const ClienteInicio = () => {
     <Fragment>
       {/* Inserta los estilos y CDNs */}
       <CustomStyles />
-      
+
       <div className="cliente-inicio">
         {/* Banner de Bienvenida */}
         <section className="welcome-banner">
@@ -203,8 +203,8 @@ const ClienteInicio = () => {
               </div>
               <div className="col-lg-5 mt-4 mt-lg-0">
                 <div className="text-center">
-                  <img 
-                    src="https://placehold.co/600x400/28a745/white?text=VillaMarkets&font=inter" 
+                  <img
+                    src="https://placehold.co/600x400/28a745/white?text=VillaMarkets&font=inter"
                     alt="Compras"
                     className="welcome-illustration img-fluid"
                   />
@@ -219,11 +219,11 @@ const ClienteInicio = () => {
           <div className="row g-4 mb-5">
             {ACCESOS_RAPIDOS.map((item) => (
               <div key={item.handlerName} className="col-6 col-md-3">
-                <div 
-                  className="quick-access-card" 
+                <div
+                  className="quick-access-card"
                   onClick={navigationHandlers[item.handlerName]}
-                  role="button" 
-                  tabIndex={0}  
+                  role="button"
+                  tabIndex={0}
                   onKeyPress={(e) => e.key === 'Enter' && navigationHandlers[item.handlerName]()}
                 >
                   <i className={item.icono}></i>
@@ -269,7 +269,7 @@ const ClienteInicio = () => {
                       <h4 className="mb-2">{oferta.titulo}</h4>
                       <p className="text-muted mb-3">{oferta.tienda}</p>
 
-<button className="btn btn-sm btn-outline-success" onClick={handleProductos}>
+                      <button className="btn btn-sm btn-outline-success" onClick={handleProductos}>
                         Ver detalles
                       </button>
                     </div>
@@ -280,11 +280,11 @@ const ClienteInicio = () => {
           </section>
         </div>
       </div>
-      
+
       {/* CDN de Bootstrap JS (opcional, pero necesario para componentes interactivos) */}
-      <script 
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
-        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossOrigin="anonymous">
       </script>
     </Fragment>
@@ -292,6 +292,3 @@ const ClienteInicio = () => {
 };
 
 export default ClienteInicio;
-
-
-

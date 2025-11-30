@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 /* =========================
    Utils / Storage helpers
 ========================= */
-const STORAGE_KEY = "carritoVillaMarket";
+const STORAGE_KEY = "carrito";          // ✅ unificado con MiCarrito y Producto.jsx
 const PLACEHOLDER = "https://via.placeholder.com/300x220?text=Villa+Markets";
 
 function safeParse(key) {
@@ -47,7 +47,7 @@ const comidas = [
 const productos = [
   { id:101, tipo:"producto", nombre:"Arroz Integral 1kg",         precio:1290, imagen:"/img/catalogos/arroz integrall.webp",   descripcion:"Arroz integral grano largo, 1kg.",          categoria:"abarrotes", minimarket:"Villa Central", popular:true,  dietas:["vegano","vegetariano","sin-gluten"], stock:24 },
   { id:102, tipo:"producto", nombre:"Leche Entera 1L",            precio:1590, imagen:"/img/catalogos/leche.webp",             descripcion:"Leche entera pasteurizada, 1 litro.",       categoria:"lacteos",   minimarket:"Villa Norte",   popular:false, dietas:["sin-gluten"],                           stock:18 },
-  { id:103, tipo:"producto", nombre:"pan amasado (4 un)",         precio:1290, imagen:"/img/catalogos/pan.jpg",                descripcion:"Pan marraqueta recién horneado.",           categoria:"panaderia", minimarket:"Villa Sur",     popular:true,  dietas:["vegetariano"],                            stock:32 },
+  { id:103, tipo:"producto", nombre:"Pan amasado (4 un)",         precio:1290, imagen:"/img/catalogos/pan.jpg",                descripcion:"Pan marraqueta recién horneado.",           categoria:"panaderia", minimarket:"Villa Sur",     popular:true,  dietas:["vegetariano"],                            stock:32 },
   { id:104, tipo:"producto", nombre:"Manzanas Rojas 1kg",         precio:1490, imagen:"/img/catalogos/manzanas.webp",          descripcion:"Manzanas rojas frescas, 1kg.",              categoria:"frutas",    minimarket:"Villa Este",    popular:false, dietas:["vegano","vegetariano","sin-gluten"],    stock:27 },
   { id:105, tipo:"producto", nombre:"Jugo de Naranja 1L",         precio:1990, imagen:"/img/catalogos/jugos.webp",              descripcion:"Jugo de naranja 100% exprimido.",           categoria:"bebidas",   minimarket:"Villa Central", popular:true,  dietas:["vegano","vegetariano","sin-gluten"],    stock:30 },
   { id:106, tipo:"producto", nombre:"Papas Fritas 140g",          precio:1490, imagen:"/img/catalogos/lays.webp",               descripcion:"Snacks de papas fritas clásicas.",          categoria:"snacks",    minimarket:"Villa Norte",   popular:false, dietas:["vegano","vegetariano","sin-gluten"],    stock:40 },
@@ -158,7 +158,35 @@ export default function ProductosGlobal() {
     setBusqueda("");
   }
 
+  // 🔐 Ahora esta función pide login SI NO hay usuario
   function addToCart(item) {
+    const usuarioActual = JSON.parse(localStorage.getItem("usuarioActual") || "null");
+    const token = localStorage.getItem("authToken");
+
+    if (!usuarioActual || !token) {
+      // Si tienes SweetAlert2
+      if (window.Swal) {
+        window.Swal.fire({
+          icon: "info",
+          title: "Inicia sesión para continuar",
+          text: "Debes registrarte o iniciar sesión para agregar productos al carrito.",
+          confirmButtonText: "Ir a iniciar sesión",
+          showCancelButton: true,
+          cancelButtonText: "Cancelar",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "/login";
+          }
+        });
+      } else {
+        // Fallback normal
+        alert("Debes registrarte o iniciar sesión para agregar productos al carrito.");
+        window.location.href = "/login";
+      }
+      return;
+    }
+
+    // Si está logueado, agrega al carrito local
     if ((item.stock || 0) <= 0) {
       if (window.Swal) {
         window.Swal.fire({
@@ -282,6 +310,12 @@ export default function ProductosGlobal() {
         </NavLink>
       </div>
 
+      {/* Aviso público */}
+      <div className="alert alert-light border mb-3 small">
+        <i className="fas fa-info-circle me-2 text-green" />
+        Esta es una vista pública. Para comprar, debes estar registrado e iniciar sesión.
+      </div>
+
       {/* Filtros */}
       <div className="filter-section">
         <div className="row">
@@ -303,7 +337,7 @@ export default function ProductosGlobal() {
               <option value="postre">Postres</option>
               <option value="vegetariano">Vegetarianos</option>
               <option value="vegano">Veganos</option>
-              {/* Minimar-kits */}
+              {/* Minimarkets */}
               <option value="abarrotes">Abarrotes</option>
               <option value="lacteos">Lácteos</option>
               <option value="panaderia">Panadería</option>
@@ -366,7 +400,11 @@ export default function ProductosGlobal() {
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
-              <button className="btn btn-green" type="button" onClick={() => setDebounced(busqueda.trim().toLowerCase())}>
+              <button
+                className="btn btn-green"
+                type="button"
+                onClick={() => setDebounced(busqueda.trim().toLowerCase())}
+              >
                 <i className="fas fa-search" />
               </button>
             </div>
@@ -406,19 +444,27 @@ export default function ProductosGlobal() {
         <nav className="my-4" aria-label="Paginación de productos">
           <ul className="pagination justify-content-center">
             <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-              <button className="page-link" onClick={() => setPage((p) => Math.max(1, p - 1))}>
+              <button
+                className="page-link"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
                 Anterior
               </button>
             </li>
 
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <li key={p} className={`page-item ${p === currentPage ? "active" : ""}`}>
-                <button className="page-link" onClick={() => setPage(p)}>{p}</button>
+                <button className="page-link" onClick={() => setPage(p)}>
+                  {p}
+                </button> 
               </li>
             ))}
 
             <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-              <button className="page-link" onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+              <button
+                className="page-link"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
                 Siguiente
               </button>
             </li>

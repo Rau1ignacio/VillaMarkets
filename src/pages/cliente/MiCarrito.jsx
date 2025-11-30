@@ -1,23 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import MetodoPago from './MetodoPago';
-import Producto from './Producto';
-
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import carritoService from '../../services/carritoService';
+import MetodoPago from './MetodoPago';
 import pedidoService from '../../services/pedidoService';
 
 const ENVIO_COSTO = 2990;
 const IVA_PORCENTAJE = 0.19;
-const formatearCLP = (valor) => 'CLP ' + new Intl.NumberFormat('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Math.round(valor));
 
+const formatearCLP = (valor) =>
+  'CLP ' +
+  new Intl.NumberFormat('es-CL', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(Math.round(Number(valor || 0)));
 
-// Componente principal del carrito de compras
+const obtenerUsuarioActual = () => {
+  try {
+    return JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+  } catch {
+    return null;
+  }
+};
+
+const getPedidosKey = (usuario) =>
+  usuario?.id ? `misPedidos_${usuario.id}` : 'misPedidos_guest';
+
+const leerPedidosLocales = (usuario) => {
+  try {
+    return JSON.parse(localStorage.getItem(getPedidosKey(usuario)) || '[]');
+  } catch {
+    localStorage.removeItem(getPedidosKey(usuario));
+    return [];
+  }
+};
+
+const guardarPedidoLocal = (usuario, pedido) => {
+  const existentes = leerPedidosLocales(usuario);
+  existentes.push(pedido);
+  localStorage.setItem(getPedidosKey(usuario), JSON.stringify(existentes));
+  localStorage.removeItem('misPedidos');
+};
+
+const construirItemsDesdeCarrito = (carrito) =>
+  carrito.map((prod) => ({
+    productoId: prod.id ?? prod.productoId ?? null,
+    productoNombre: prod.nombre || prod.titulo || `Producto ${prod.id || ''}`.trim(),
+    imagenProducto: prod.imagen || prod.image || null,
+    cantidad: Number(prod.cantidad) || 1,
+    precioUnitario: Number(prod.precio) || 0
+  }));
+
 const MiCarrito = () => {
-
   const [carrito, setCarrito] = useState([]);
-  // const [direccion, setDireccion] = useState('');
-  // const [metodoPago, setMetodoPago] = useState('');
-  // const [codigoDescuento, setCodigoDescuento] = useState('');
   const [mostrarMetodoPago, setMostrarMetodoPago] = useState(false);
   const [pagoDatos, setPagoDatos] = useState(null);
   const [descuento, setDescuento] = useState(0);
@@ -25,223 +58,147 @@ const MiCarrito = () => {
   const [mensaje, setMensaje] = useState('');
   const [confirmado, setConfirmado] = useState(false);
   const navigate = useNavigate();
-  
+  const [usuarioActual] = useState(() => obtenerUsuarioActual());
+
   useEffect(() => {
-    // Intentar cargar carrito del servidor
-    const cargarCarrito = async () => {
-      const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
-      const authToken = localStorage.getItem('authToken');
-      
-      if (usuarioActual && authToken) {
-        try {
-          const carritoServidor = await carritoService.obtener();
-          if (carritoServidor && carritoServidor.items) {
-            setCarrito(carritoServidor.items);
-            return;
-          }
-        } catch (err) {
-          console.warn('Error al cargar carrito del servidor, usando localStorage:', err?.message || err);
-        }
-      }
-
-      // Fallback: cargar desde localStorage
-      const carritoGuardado = JSON.parse(localStorage.getItem('carrito')) || [];
-      setCarrito(carritoGuardado);
-    };
-
-    cargarCarrito();
+    const carritoGuardado = JSON.parse(localStorage.getItem('carrito') || '[]');
+    setCarrito(Array.isArray(carritoGuardado) ? carritoGuardado : []);
   }, []);
 
-  const calcularSubtotal = () => carrito.reduce((acc, prod) => acc + prod.precio * prod.cantidad, 0);
-  const calcularIVA = (subtotal) => subtotal * IVA_PORCENTAJE;
-  const calcularEnvio = () => envioGratis ? 0 : ENVIO_COSTO;
-  const calcularTotal = () => {
-    const subtotal = calcularSubtotal();
-    const iva = calcularIVA(subtotal);
-    const envio = calcularEnvio();
-    return subtotal + iva + envio - descuento;
+  const subtotal = useMemo(
+    () =>
+      carrito.reduce(
+        (acc, prod) => acc + Number(prod.precio || 0) * Number(prod.cantidad || 0),
+        0
+      ),
+    [carrito]
+  );
+
+  const iva = useMemo(() => subtotal * IVA_PORCENTAJE, [subtotal]);
+  const costoEnvio = useMemo(() => (envioGratis ? 0 : ENVIO_COSTO), [envioGratis]);
+  const total = useMemo(() => subtotal + iva + costoEnvio - descuento, [subtotal, iva, costoEnvio, descuento]);
+
+  const finalizarCompra = () => {
+    if (carrito.length === 0) {
+      setMensaje('Tu carrito esta vacio.');
+      return;
+    }
+    setMostrarMetodoPago(true);
+    setMensaje('');
   };
 
-  // const aplicarDescuento = () => {};
-
-  const descontarStock = async () => {
-    // La lógica de descontar stock ahora está en el backend (pedidoService.crear)
-    console.log('Stock será descontado automáticamente en el servidor al crear el pedido');
+  const limpiarCarrito = () => {
+    setCarrito([]);
+    localStorage.removeItem('carrito');
+    setDescuento(0);
+    setEnvioGratis(false);
   };
 
   const handleConfirmarPago = async (datosPago) => {
-    const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
-    const authToken = localStorage.getItem('authToken');
-    
-    const productosComprados = carrito.map(prod => ({ ...prod }));
-    const subtotal = calcularSubtotal();
-    const ivaCalculado = calcularIVA(subtotal);
-    const envioCalculado = calcularEnvio();
-    const totalCalculado = subtotal + ivaCalculado + envioCalculado - descuento;
+    const respaldoItems = construirItemsDesdeCarrito(carrito);
+    const direccionEntrega = datosPago?.direccion || usuarioActual?.direccion || '';
 
-    let estadoPedido = 'Procesando';
-    let mensajeUsuario = '¡Compra realizada!';
+    const tiendaIdDesdeCarrito =
+      carrito
+        .map((prod) => prod.tiendaId ?? prod.tienda?.id ?? prod.minimarketId ?? null)
+        .find((id) => id != null) || null;
 
-    // Si hay usuario y token, intentar crear pedido en servidor
-    if (usuarioActual && authToken) {
-      try {
-        const respuesta = await pedidoService.crear({
-          usuarioId: usuarioActual.id || usuarioActual.usuario,
-          items: productosComprados,
-          subtotal,
-          iva: ivaCalculado,
-          envio: envioCalculado,
-          descuento,
-          total: totalCalculado,
-          metodoPago: datosPago.metodoPago || 'Pago en línea',
-          direccion: datosPago.direccion || '',
-          estado: 'Procesando'
-        });
-        
-        if (respuesta && respuesta.id) {
-          estadoPedido = 'Confirmado en servidor';
-          mensajeUsuario = '¡Compra realizada y confirmada en el servidor!';
-          // Guardar en localStorage también como respaldo
-          const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
-          const ahora = new Date();
-          const nuevoPedido = {
-            id: respuesta.id,
-            fecha: ahora.toLocaleDateString(),
-            hora: ahora.toLocaleTimeString(),
-            total: totalCalculado,
-            estado: estadoPedido,
-            metodoPago: datosPago.metodoPago || 'Pago en línea',
-            direccion: datosPago.direccion || '',
-            descuento,
-            envio: envioCalculado,
-            iva: ivaCalculado,
-            productos: productosComprados,
-            nombreCliente: datosPago.nombre || usuarioActual.usuario || '',
-            datosPago
-          };
-          pedidosGuardados.push(nuevoPedido);
-          localStorage.setItem('misPedidos', JSON.stringify(pedidosGuardados));
-        }
-      } catch (err) {
-        console.warn('Error al crear pedido en servidor, guardando solo en localStorage:', err?.message || err);
-        estadoPedido = 'Guardado localmente';
-        mensajeUsuario = 'Tu pedido fue guardado localmente (el servidor no respondió).';
+    const pedidoDTO = {
+      usuarioId: usuarioActual?.id || null,
+      tiendaId: tiendaIdDesdeCarrito,
+      tipoEntrega: datosPago?.tipoEntrega || 'domicilio',
+      metodoPago: datosPago?.metodoPago || 'transferencia',
+      direccionEntrega,
+      items: carrito.map((prod) => ({
+        productoId: prod.id ?? prod.productoId,
+        cantidad: Number(prod.cantidad) || 1,
+        precioUnitario: Number(prod.precio) || 0
+      }))
+    };
+
+    let mensajeUsuario = 'Compra realizada.';
+
+    try {
+      if (!pedidoDTO.usuarioId) {
+        throw new Error('Debe iniciar sesion para registrar el pedido.');
       }
-    } else {
-      // Fallback: guardar solo en localStorage
-      const pedidosGuardados = JSON.parse(localStorage.getItem('misPedidos')) || [];
-      const ahora = new Date();
-      const nuevoPedido = {
-        fecha: ahora.toLocaleDateString(),
-        hora: ahora.toLocaleTimeString(),
-        total: totalCalculado,
-        estado: estadoPedido,
-        metodoPago: datosPago.metodoPago || 'Pago en línea',
-        direccion: datosPago.direccion || '',
-        descuento,
-        envio: envioCalculado,
-        iva: ivaCalculado,
-        productos: productosComprados,
-        nombreCliente: datosPago.nombre || '',
-        datosPago
+      const respuesta = await pedidoService.crear(pedidoDTO);
+      const pedidoGuardado = {
+        ...respuesta,
+        usuarioId: respuesta?.usuarioId ?? usuarioActual?.id ?? null,
+        items:
+          respuesta?.items && respuesta.items.length > 0
+            ? respuesta.items
+            : respaldoItems
       };
-      pedidosGuardados.push(nuevoPedido);
-      localStorage.setItem('misPedidos', JSON.stringify(pedidosGuardados));
+      guardarPedidoLocal(usuarioActual, pedidoGuardado);
+      mensajeUsuario = 'Compra registrada con exito.';
+    } catch (error) {
+      console.warn('Fallo al crear pedido en backend, usando respaldo local:', error);
+      mensajeUsuario =
+        usuarioActual?.id
+          ? 'No pudimos contactar al servidor. Guardamos el pedido localmente.'
+          : 'Debes iniciar sesion para enviar el pedido. Guardamos el pedido localmente.';
+
+      const pedidoLocal = {
+        id: `local-${Date.now()}`,
+        usuarioId: usuarioActual?.id || null,
+        tiendaId: pedidoDTO.tiendaId,
+        fechaPedido: new Date().toISOString(),
+        estado: 'GUARDADO_LOCALMENTE',
+        tipoEntrega: pedidoDTO.tipoEntrega,
+        metodoPago: pedidoDTO.metodoPago,
+        direccionEntrega: pedidoDTO.direccionEntrega,
+        total: Math.round(total),
+        items: respaldoItems
+      };
+      guardarPedidoLocal(usuarioActual, pedidoLocal);
     }
 
-    // Limpiar carrito (servidor + localStorage)
-    if (usuarioActual && authToken) {
-      try {
-        await carritoService.limpiar();
-      } catch (err) {
-        console.warn('Error al limpiar carrito en servidor:', err?.message || err);
-      }
-    }
-
-    setCarrito([]);
-    localStorage.removeItem('carrito');
+    limpiarCarrito();
     setMensaje(mensajeUsuario);
-    setDescuento(0);
-    setEnvioGratis(false);
     setConfirmado(true);
     setPagoDatos(datosPago);
     setMostrarMetodoPago(false);
-    // Redirigir automáticamente al historial después de 2 segundos
+
     setTimeout(() => {
       navigate('/cliente/mispedidos');
     }, 2000);
   };
 
-  // CRUD: Eliminar producto del carrito
-  const eliminarProducto = async (id) => {
-    if (window.confirm('¿Seguro que deseas eliminar este producto del carrito?')) {
-      const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
-      const authToken = localStorage.getItem('authToken');
-
-      // Intentar eliminar del servidor
-      if (usuarioActual && authToken) {
-        try {
-          await carritoService.eliminarItem(id);
-        } catch (err) {
-          console.warn('Error al eliminar del carrito del servidor:', err?.message || err);
-        }
-      }
-
-      // Eliminar del carrito local (siempre)
-      const nuevoCarrito = carrito.filter(p => p.id !== id);
+  const eliminarProducto = (id) => {
+    if (window.confirm('Seguro que deseas eliminar este producto del carrito?')) {
+      const nuevoCarrito = carrito.filter((p) => (p.id ?? p.productoId) !== id);
       setCarrito(nuevoCarrito);
       localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
       setMensaje('Producto eliminado correctamente.');
     }
   };
 
-  // CRUD: Modificar cantidad de producto
-  const modificarCantidad = async (id, cantidad) => {
+  const modificarCantidad = (id, cantidad) => {
     if (cantidad < 1) return;
-    
-    const nuevoCarrito = carrito.map(p =>
-      p.id === id ? { ...p, cantidad } : p
+    const nuevoCarrito = carrito.map((p) =>
+      (p.id ?? p.productoId) === id ? { ...p, cantidad } : p
     );
     setCarrito(nuevoCarrito);
     localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
-    
-    // Intentar actualizar en servidor (opcional)
-    const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
-    const authToken = localStorage.getItem('authToken');
-    if (usuarioActual && authToken) {
-      try {
-        const prod = carrito.find(p => p.id === id);
-        if (prod) {
-          await carritoService.agregarItem({
-            productoId: id,
-            cantidad: cantidad - prod.cantidad, // diferencia
-            precio: prod.precio,
-            nombre: prod.nombre
-          });
-        }
-      } catch (err) {
-        console.warn('Error al actualizar cantidad en servidor:', err?.message || err);
-      }
-    }
-    
     setMensaje('Cantidad modificada correctamente.');
   };
 
   return (
-    <div className='m-5'>
+    <div className="m-5">
+      <h2>Mi Carrito</h2>
 
-  <h2>Mi Carrito</h2>
       {carrito.length === 0 ? (
-        <p>Tu carrito está vacío.</p>
+        <p>Tu carrito esta vacio.</p>
       ) : (
         <div>
-          {/* Botón para volver al catálogo */}
           <div style={{ marginBottom: 20 }}>
-            <Link to="./cliente/producto" className="btn btn-green">
-              <i className="fas fa-arrow-left me-1"></i> Seguir comprando
-              
+            <Link to="/cliente/producto" className="btn btn-green">
+              <i className="fas fa-arrow-left me-1" /> Seguir comprando
             </Link>
           </div>
+
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
@@ -250,6 +207,7 @@ const MiCarrito = () => {
                 <th>Cantidad</th>
                 <th>Precio</th>
                 <th>Subtotal</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -264,45 +222,69 @@ const MiCarrito = () => {
                             : `/images/productos/${prod.imagen}`
                           : '/images/default.jpg'
                       }
-                      alt={`${prod.nombre} thumbnail sold by ${prod.minimarket}, price S/ ${prod.precio}, quantity ${prod.cantidad}. Neutral product photo on light background, factual informative tone`}
-                      style={{ width: 40, height: 40, objectFit: 'contain', marginRight: 10, borderRadius: 6 }}
-                      onError={e => { e.target.src = '/images/default.jpg'; }}
+                      alt={prod.nombre}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        objectFit: 'contain',
+                        marginRight: 10,
+                        borderRadius: 6
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/default.jpg';
+                      }}
                     />
                     {prod.nombre}
                   </td>
-                  <td>{prod.minimarket}</td>
+                  <td>{prod.minimarket || prod.tiendaNombre || '-'}</td>
                   <td>
                     <input
                       type="number"
                       min={1}
                       value={prod.cantidad}
                       style={{ width: 60 }}
-                      onChange={e => modificarCantidad(prod.id, parseInt(e.target.value))}
+                      onChange={(e) =>
+                        modificarCantidad(
+                          prod.id ?? prod.productoId,
+                          parseInt(e.target.value, 10) || 1
+                        )
+                      }
                     />
                   </td>
                   <td>{formatearCLP(prod.precio)}</td>
-                  <td>{formatearCLP(prod.precio * prod.cantidad)}</td>
+                  <td>{formatearCLP((prod.precio || 0) * (prod.cantidad || 0))}</td>
                   <td>
-                    <button className="btn btn-danger btn-sm" onClick={() => eliminarProducto(prod.id)}>
-                      <i className="fas fa-trash"></i>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => eliminarProducto(prod.id ?? prod.productoId)}
+                    >
+                      <i className="fas fa-trash" />
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div style={{ marginTop: 20, background: '#f8f9fa', borderRadius: 10, padding: 20 }}>
+
+          <div
+            style={{
+              marginTop: 20,
+              background: '#f8f9fa',
+              borderRadius: 10,
+              padding: 20
+            }}
+          >
             <h4>Resumen</h4>
             <div className="d-flex justify-content-between">
               <span>Subtotal:</span>
-              <span>{formatearCLP(calcularSubtotal())}</span>
+              <span>{formatearCLP(subtotal)}</span>
             </div>
             <div className="d-flex justify-content-between">
               <span>IVA (19%):</span>
-              <span>{formatearCLP(calcularIVA(calcularSubtotal()))}</span>
+              <span>{formatearCLP(iva)}</span>
             </div>
             <div className="d-flex justify-content-between">
-              <span>Envío:</span>
+              <span>Envio:</span>
               <span>{envioGratis ? 'Gratis' : formatearCLP(ENVIO_COSTO)}</span>
             </div>
             <div className="d-flex justify-content-between text-danger">
@@ -312,31 +294,46 @@ const MiCarrito = () => {
             <hr />
             <div className="d-flex justify-content-between fw-bold">
               <span>Total:</span>
-              <span className="text-green">{formatearCLP(calcularTotal())}</span>
+              <span className="text-green">{formatearCLP(total)}</span>
             </div>
-            {/* Campo de descuento eliminado */}
           </div>
         </div>
       )}
+
       <div style={{ marginTop: 20 }}>
-        {!mostrarMetodoPago && !confirmado && (
-          <button onClick={finalizarCompra}>Confirmar Pago</button>
+        {!mostrarMetodoPago && !confirmado && carrito.length > 0 && (
+          <button className="btn btn-primary" onClick={finalizarCompra}>
+            Confirmar Pago
+          </button>
         )}
         {mostrarMetodoPago && (
-          <MetodoPago total={calcularTotal().toFixed(2)} onConfirmar={handleConfirmarPago} />
+          <MetodoPago total={total.toFixed(2)} onConfirmar={handleConfirmarPago} />
         )}
       </div>
+
       {mensaje && <p style={{ marginTop: 10 }}>{mensaje}</p>}
+
       {confirmado && pagoDatos && (
-        <div style={{ marginTop: 20, background: '#d4edda', padding: 20, borderRadius: 10 }}>
-          <h4>¡Pedido realizado con éxito!</h4>
-          <p>Recibirás un email de confirmación en breve a <b>{pagoDatos.correo}</b>.</p>
-          {pagoDatos.comprobante && (
-            <div>
-              <p>Comprobante subido: <b>{pagoDatos.comprobante.name}</b></p>
-            </div>
+        <div
+          style={{
+            marginTop: 20,
+            background: '#d4edda',
+            padding: 20,
+            borderRadius: 10
+          }}
+        >
+          <h4>Pedido realizado con exito!</h4>
+          {pagoDatos.correo && (
+            <p>
+              Recibiras un email de confirmacion en <b>{pagoDatos.correo}</b>.
+            </p>
           )}
-          <div style={{marginTop:16}}>
+          {pagoDatos.comprobante && (
+            <p>
+              Comprobante subido: <b>{pagoDatos.comprobante.name}</b>
+            </p>
+          )}
+          <div style={{ marginTop: 16 }}>
             <span>Redirigiendo al historial de compras...</span>
           </div>
         </div>
