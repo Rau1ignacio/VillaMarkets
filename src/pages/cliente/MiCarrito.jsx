@@ -54,9 +54,10 @@ const MiCarrito = () => {
   const [pagoDatos, setPagoDatos] = useState(null);
   const navigate = useNavigate();
 
-  const tieneSesion = Boolean(usuarioActual?.id && localStorage.getItem('authToken'));
+  const tieneSesion = Boolean(usuarioActual?.id);
 
   useEffect(() => {
+    console.log('[MiCarrito] tieneSesion?', tieneSesion);
     const cargar = async () => {
       if (tieneSesion) {
         setCargandoCarrito(true);
@@ -84,6 +85,7 @@ const MiCarrito = () => {
           setCargandoCarrito(false);
         }
       } else {
+        console.warn('[MiCarrito] sin sesión, usando carrito local');
         setCarrito(leerLocal(getCarritoKey(null)));
       }
     };
@@ -106,6 +108,11 @@ const MiCarrito = () => {
   };
 
   const finalizarCompra = () => {
+    if (!tieneSesion) {
+      alert('Debes iniciar sesión para confirmar tu compra.');
+      navigate('/login');
+      return;
+    }
     if (carrito.length === 0) {
       setMensaje('Tu carrito está vacío.');
       return;

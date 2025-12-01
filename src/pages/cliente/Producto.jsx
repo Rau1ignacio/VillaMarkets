@@ -68,18 +68,48 @@ const Producto = () => {
     const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
     const carritoKey = usuarioActual?.id ? `carrito_${usuarioActual.id}` : 'carrito_guest';
 
-    // Si hay usuario logueado, usamos el carrito real del backend
-    if (usuarioActual && localStorage.getItem('authToken')) {
-      try {
-        await carritoService.agregarItem(usuarioActual.id, {
-          productoId: producto.id,
-          cantidad: 1,
-          precioUnitario: producto.precio   // el backend espera "precioUnitario"
+    if (!usuarioActual?.id) {
+      console.warn('[addToCart] usuario sin sesión o sin id válido');
+      if (window.Swal) {
+        window.Swal.fire({
+          icon: 'info',
+          title: 'Inicia sesión para continuar',
+          text: 'Debes iniciar sesión para agregar productos al carrito.',
+          confirmButtonText: 'Ir a login',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar'
+        }).then(result => {
+          if (result.isConfirmed) window.location.href = '/login';
         });
-        console.log('Producto agregado al carrito del servidor');
-      } catch (err) {
-        console.warn('Error al agregar al carrito del servidor, usando fallback local:', err?.message || err);
+      } else {
+        alert('Debes iniciar sesión para agregar productos al carrito.');
+        window.location.href = '/login';
       }
+      return;
+    }
+
+    try {
+      console.log('[addToCart] endpoint', `/v1/carritos/usuario/${usuarioActual.id}/add`);
+      console.log('[addToCart] payload', {
+        productoId: producto.id,
+        cantidad: 1,
+        precioUnitario: Number(producto.precio)
+      });
+      await carritoService.agregarItem(usuarioActual.id, {
+        productoId: producto.id,
+        cantidad: 1,
+        precioUnitario: Number(producto.precio)
+      });
+      console.log('[addToCart] producto agregado al backend');
+    } catch (err) {
+      if (err.response) {
+        console.warn('[addToCart] backend respondio', err.response.status, err.response.data);
+      } else if (err.request) {
+        console.warn('[addToCart] sin respuesta del backend', err.message);
+      } else {
+        console.warn('[addToCart] error al preparar request', err.message);
+      }
+      console.warn('Error al agregar al carrito del servidor, se mantiene respaldo local');
     }
 
     // Fallback/local: mantener también en localStorage
