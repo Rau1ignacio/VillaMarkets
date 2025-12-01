@@ -1,116 +1,94 @@
-# VillaMarkets · Plataforma Fullstack de Minimarkets
+﻿# VillaMarkets Frontend
 
-VillaMarkets es una aplicación educativa construida con **React + Vite** que simula el flujo completo de un cliente en una red de minimarkets: exploración de productos, gestión de carrito, checkout, historial de pedidos y navegación por tiendas cercanas. El proyecto sirve como base para prácticas de desarrollo fullstack II, enfocadas en arquitectura frontend moderna, manejo de estado y pruebas automatizadas.
+Aplicacion SPA desarrollada con **React + Vite** para el proyecto VillaMarkets. Implementa el flujo completo de clientes y administradores: catalogo, carrito sincronizado, pedidos, panel de control y consumo de la API REST del backend Spring Boot.
 
----
+## Tabla de contenidos
+1. [Arquitectura](#arquitectura)
+2. [Requisitos](#requisitos)
+3. [Instalacion y ejecucion](#instalacion-y-ejecucion)
+4. [Variables de entorno](#variables-de-entorno)
+5. [Scripts](#scripts)
+6. [Estructura de carpetas](#estructura-de-carpetas)
+7. [Integracion con el backend](#integracion-con-el-backend)
+8. [Testing y linting](#testing-y-linting)
+9. [Despliegue](#despliegue)
+10. [Contribuir](#contribuir)
 
-## Tabla de contenido
-1. [Stack tecnológico](#stack-tecnológico)
-2. [Características principales](#características-principales)
-3. [Estructura del proyecto](#estructura-del-proyecto)
-4. [Requisitos y configuración](#requisitos-y-configuración)
-5. [Scripts disponibles](#scripts-disponibles)
-6. [Testing y calidad](#testing-y-calidad)
-7. [Convenciones](#convenciones)
-8. [Próximos pasos sugeridos](#próximos-pasos-sugeridos)
-9. [Licencia](#licencia)
+## Arquitectura
+- **Framework**: React 18 + React Router.
+- **Build**: Vite 5 con ES Modules.
+- **Estilos**: Bootstrap 5, utilidades personalizadas en `src/styles` y componentes propios.
+- **Estado**: Hooks + `localStorage` para carrito/usuario, servicios axios (`src/services`) para consumir la API.
+- **Mapas y utilidades**: Leaflet, FileSaver, XLSX.
 
----
+## Requisitos
+- Node.js 18+ y npm 9+ (o pnpm/yarn).
+- Acceso al backend en `http://<host>:8080/api` o la URL configurada en `.env`.
 
-## Stack tecnológico
-
-| Área | Tecnologías |
-| ---- | ----------- |
-| **Frontend** | React 19, React Router 7, React Hooks, Context/Redux (en progreso) |
-| **Build Tooling** | Vite 5, ES Modules, Babel |
-| **UI / Estilos** | Bootstrap 5, Bootstrap Icons, Font Awesome, CSS Modules locales |
-| **Mapas y utilidades** | Leaflet / React-Leaflet, FileSaver, XLSX |
-| **Calidad** | ESLint 9, Jest 30, Testing Library, Vitest-ready |
-
----
-
-## Características principales
-
-- **Catálogo filtrable** (`src/pages/cliente/Producto.jsx`): filtros por categoría, stock, búsqueda y ordenamiento; integración con `localStorage` para persistir carrito.
-- **Mi Carrito + Checkout** (`src/pages/cliente/MiCarrito.jsx`): cálculo de subtotal, IVA, envío y descuentos en formato CLP, paso de métodos de pago (`MetodoPago.jsx`) y generación de historial.
-- **Historial de pedidos** (`src/pages/cliente/MisPedidos.jsx`): listado compacto de compras con imágenes, totales, estado y navegación rápida.
-- **Dashboard de cliente** (`src/pages/cliente/ClienteInicio.jsx`): banner de bienvenida, accesos rápidos, estadísticas y ofertas dinámicas con estilos modularizados (`src/styles/ClienteInicio.css`).
-- **Minimarkets cercanos** (`src/pages/cliente/MinimarketCliente.jsx`): integración con Leaflet para mostrar tiendas sobre un mapa interactivo.
-- **Flujo de pruebas** (`src/testing/*.test.jsx`): suites de ejemplo para componentes clave, configuradas con Jest + React Testing Library.
-
----
-
-## Estructura del proyecto
-
-```
-├── public/                     # Recursos estáticos servidos por Vite
-├── src/
-│   ├── components/             # Componentes reutilizables (Navbar, Layout, etc.)
-│   ├── pages/                  # Páginas agrupadas por rol (cliente, admin, etc.)
-│   ├── styles/                 # Hojas de estilo específicas (ClienteInicio.css, etc.)
-│   ├── testing/                # Pruebas unitarias/Jest
-│   ├── utils/                  # Helpers, servicios y constantes
-│   ├── App.jsx                 # Definición de rutas
-│   └── main.jsx                # Bootstrapping de React + Vite
-├── package.json
-├── vite.config.js
-└── README.md
+## Instalacion y ejecucion
+```bash
+git clone https://github.com/Rau1ignacio/VillaMarkets.git
+cd VillaMarkets
+npm install
+npm run dev        # levanta http://localhost:5173
 ```
 
----
+Para un build optimizado:
+```bash
+npm run build
+npm run preview    # sirve la carpeta dist
+```
 
-## Requisitos y configuración
+## Variables de entorno
+Crea `.env` (o copia `.env.example`) con:
+```
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+En despliegues S3/CloudFront apunta a la IP/ALB del backend.
 
-1. **Node.js 18+** y **npm 9+** (o pnpm/yarn si prefieres).
-2. Clona el repositorio y entra en la carpeta del proyecto.
-3. Instala dependencias:
-   ```bash
-   npm install
-   ```
-4. Variables de entorno: Vite usa `.env`. Puedes duplicar `.env.example` si existe.
+## Scripts
+| Comando | Descripcion |
+| ------- | ----------- |
+| `npm run dev` | Modo desarrollo con HMR. |
+| `npm run build` | Genera `dist/`. |
+| `npm run preview` | Sirve `dist/` localmente. |
+| `npm run lint` | Ejecuta ESLint. |
+| `npm run test` | Corre Jest + React Testing Library. |
 
----
+## Estructura de carpetas
+```
+public/
+src/
+  components/      # Navbar, cards, layout
+  pages/           # Vistas por rol (publico, cliente, admin)
+  services/        # axios instance + servicios (productoService, carritoService, etc.)
+  styles/          # CSS especificos
+  testing/         # Suites Jest
+  App.jsx          # Definicion de rutas
+  main.jsx         # Bootstrap React
+vite.config.js
+```
 
-## Scripts disponibles
+## Integracion con el backend
+- `src/services/api.js` configura axios con `baseURL = VITE_API_BASE_URL` y adjunta el token almacenado en `localStorage` (`authToken`).
+- Servicios como `carritoService` y `pedidoService` consumen los endpoints REST (`/v1/carritos`, `/v1/pedidos`, `/v1/productos`).
+- Componentes clave:
+  - `Producto.jsx`: lista productos y dispara `POST /carritos/usuario/{id}/add`.
+  - `MiCarrito.jsx`: sincroniza carrito remoto, permite modificar cantidades y crear pedidos.
+  - `Login.jsx`: guarda `usuarioActual` y `authToken` que luego reutilizan las rutas protegidas.
 
-| Script | Descripción |
-| ------ | ----------- |
-| `npm run dev` | Levanta el servidor de desarrollo Vite (http://localhost:5173). |
-| `npm run build` | Genera la versión optimizada en `dist/`. |
-| `npm run preview` | Sirve el build para pruebas antes del deploy. |
-| `npm run lint` | Ejecuta ESLint con la configuración del proyecto. |
-| `npm run test` | Corre las suites de Jest/Testing Library. |
+## Testing y linting
+- **Testing**: Jest + React Testing Library (`npm run test`). Los archivos viven en `src/testing` e incluyen pruebas de componentes y hooks.
+- **Linting**: ESLint 9 con reglas para React Hooks. Ejecuta `npm run lint` antes de subir cambios.
 
----
+## Despliegue
+1. Ejecuta `npm run build` y sube `dist/` a S3 (Static Website Hosting) o a cualquier CDN.
+2. Configura el dominio (S3 + CloudFront) con fallback a `index.html`.
+3. Asegura que `VITE_API_BASE_URL` apunte a la URL publica del backend (idealmente HTTPS).
 
-## Testing y calidad
+## Contribuir
+- Crea ramas con el prefijo `feature/` o `fix/`.
+- Ejecuta `npm run lint` y `npm run test` antes del pull request.
+- Documenta nuevas rutas o variables en este README.
 
-- **Unit/Component tests**: ubicados en `src/testing`. Importa el componente desde `src/pages/...` o `src/components/...` y usa `@testing-library/react` para assertions.
-- **Lint**: usa reglas base de ESLint y plugins para hooks + react-refresh. Corre `npm run lint` antes de abrir PRs.
-- **Cobertura**: Jest está configurado para generar reportes HTML en `coverage/` cuando se ejecuta con la flag correspondiente.
-
----
-
-## Convenciones
-
-- **Componentes**: PascalCase en archivos y nombres de función (`MiCarrito.jsx`). Mantén los hooks principales (`useEffect`, `useState`) en la parte superior.
-- **Estilos**: se prioriza Bootstrap y utilidades; los estilos a medida se guardan en `src/styles`. Evita bloques `<style>` inline.
-- **Rutas**: todas las rutas públicas viven en `App.jsx`; agrega nuevas rutas importando la página correspondiente.
-- **Estado global**: hoy se usa `localStorage` + props; la migración a Redux Toolkit está planificada.
-
----
-
-## Próximos pasos sugeridos
-
-1. **API real**: reemplazar los mocks/localStorage por un backend REST/GraphQL.
-2. **Autenticación**: integrar flujo de login, roles y guardas de ruta.
-3. **Redux Toolkit / Zustand**: centralizar carrito, usuario y pedidos.
-4. **Internacionalización (i18n)**: exponer strings en español/inglés.
-5. **CI/CD**: añadir pipeline de lint + pruebas + preview automático (GitHub Actions/Vercel).
-6. **Accesibilidad**: auditar con Lighthouse y corregir contraste, labels y navegación por teclado.
-
----
-
-## Licencia
-
-Este repositorio se distribuye bajo la licencia MIT incluida en `LICENSE`. Eres libre de usarlo con fines educativos y extenderlo según tus necesidades, manteniendo el aviso de copyright.
+Proyecto mantenido en el marco del curso **DSY1104 - Desarrollo Fullstack II**.
