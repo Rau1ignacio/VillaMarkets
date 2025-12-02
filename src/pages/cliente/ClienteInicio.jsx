@@ -51,7 +51,7 @@ const ACCESOS_RAPIDOS = [
   // De momento no hemos puesto estadisticas verdaderas
   {
     titulo: "Productos",
-    descripcion: "Explora nuestro cat├ílogo completo",
+    descripcion: "Explora nuestro catalogo completo",
     icono: "fas fa-shopping-bag",
     handlerName: "productos"
   },

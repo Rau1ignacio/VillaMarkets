@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 /* =========================
    Utils / Storage helpers
 ========================= */
-const STORAGE_KEY = "carrito";          // ✅ unificado con MiCarrito y Producto.jsx
+const STORAGE_KEY = "carrito";          
 const PLACEHOLDER = "https://via.placeholder.com/300x220?text=Villa+Markets";
 
 function safeParse(key) {
@@ -35,26 +35,26 @@ function updateCartBadge() {
 ========================= */
 // Comidas
 const comidas = [
-  { id:1,  tipo:"comida", nombre:"Lasaña de Carne",        precio:6990, imagen:"/img/Lasaña de carne.jpg",        descripcion:"Deliciosa lasaña casera con carne molida y salsa bechamel.", categoria:"plato-principal", minimarket:"Villa Central",  calorias:450, popular:true,  stock:999 },
-  { id:2,  tipo:"comida", nombre:"Ensalada César",         precio:4990, imagen:"/img/ensalada cesar.jpg",         descripcion:"Clásica ensalada césar con pollo grillado y aderezo casero.",  categoria:"entrada",          minimarket:"Villa Norte",    calorias:320, popular:true,  stock:999 },
-  { id:3,  tipo:"comida", nombre:"Risotto de Champiñones", precio:5990, imagen:"/img/risotto de champiñones.jpg", descripcion:"Cremoso risotto con hongos silvestres y queso parmesano.",     categoria:"plato-principal", minimarket:"Villa Este",     calorias:380, vegetariano:true, stock:999 },
-  { id:4,  tipo:"comida", nombre:"Tiramisú",               precio:3990, imagen:"/img/Tiramisú.jpg",               descripcion:"Postre italiano con bizcocho, café y crema de mascarpone.",  categoria:"postre",           minimarket:"Villa Sur",      calorias:320, popular:true,  stock:999 },
-  { id:5,  tipo:"comida", nombre:"Curry de Garbanzos",     precio:4590, imagen:"/img/Curry de Garbanzos.jpg",     descripcion:"Curry vegano con leche de coco y especias hindúes.",         categoria:"plato-principal", minimarket:"Villa Norte",    calorias:350, vegano:true,   stock:999 },
-  { id:6,  tipo:"comida", nombre:"Sopa de Tomate",         precio:3290, imagen:"/img/Sopa de Tomate.jpg",         descripcion:"Sopa casera de tomate con albahaca fresca.",                categoria:"entrada",          minimarket:"Villa Central",  calorias:220, vegetariano:true, stock:999 },
+  { id:1,  tipo:"comida", nombre:"Lasaña de Carne",        precio:6990, imagen:"/img/Catalogos/lasana-de-carne.jpg",        descripcion:"Deliciosa lasaña casera con carne molida y salsa bechamel.", categoria:"plato-principal", minimarket:"Villa Central",  calorias:450, popular:true,  stock:999 },
+  { id:2,  tipo:"comida", nombre:"Ensalada César",         precio:4990, imagen:"/img/Catalogos/ensalada-cesar.jpg",         descripcion:"Clásica ensalada césar con pollo grillado y aderezo casero.",  categoria:"entrada",          minimarket:"Villa Norte",    calorias:320, popular:true,  stock:999 },
+  { id:3,  tipo:"comida", nombre:"Risotto de Champiñones", precio:5990, imagen:"/img/Catalogos/risotto-champinones.jpg", descripcion:"Cremoso risotto con hongos silvestres y queso parmesano.",     categoria:"plato-principal", minimarket:"Villa Este",     calorias:380, vegetariano:true, stock:999 },
+  { id:4,  tipo:"comida", nombre:"Tiramisú",               precio:3990, imagen:"/img/Catalogos/tiramisu.jpg",               descripcion:"Postre italiano con bizcocho, café y crema de mascarpone.",  categoria:"postre",           minimarket:"Villa Sur",      calorias:320, popular:true,  stock:999 },
+  { id:5,  tipo:"comida", nombre:"Curry de Garbanzos",     precio:4590, imagen:"/img/Catalogos/curry-garbanzos.jpg",     descripcion:"Curry vegano con leche de coco y especias hindúes.",         categoria:"plato-principal", minimarket:"Villa Norte",    calorias:350, vegano:true,   stock:999 },
+  { id:6,  tipo:"comida", nombre:"Sopa de Tomate",         precio:3290, imagen:"/img/Catalogos/sopa-tomate.jpg",         descripcion:"Sopa casera de tomate con albahaca fresca.",                categoria:"entrada",          minimarket:"Villa Central",  calorias:220, vegetariano:true, stock:999 },
 ];
 
 // Productos
 const productos = [
-  { id:101, tipo:"producto", nombre:"Arroz Integral 1kg",         precio:1290, imagen:"/img/catalogos/arroz integrall.webp",   descripcion:"Arroz integral grano largo, 1kg.",          categoria:"abarrotes", minimarket:"Villa Central", popular:true,  dietas:["vegano","vegetariano","sin-gluten"], stock:24 },
-  { id:102, tipo:"producto", nombre:"Leche Entera 1L",            precio:1590, imagen:"/img/catalogos/leche.webp",             descripcion:"Leche entera pasteurizada, 1 litro.",       categoria:"lacteos",   minimarket:"Villa Norte",   popular:false, dietas:["sin-gluten"],                           stock:18 },
-  { id:103, tipo:"producto", nombre:"Pan amasado (4 un)",         precio:1290, imagen:"/img/catalogos/pan.jpg",                descripcion:"Pan marraqueta recién horneado.",           categoria:"panaderia", minimarket:"Villa Sur",     popular:true,  dietas:["vegetariano"],                            stock:32 },
-  { id:104, tipo:"producto", nombre:"Manzanas Rojas 1kg",         precio:1490, imagen:"/img/catalogos/manzanas.webp",          descripcion:"Manzanas rojas frescas, 1kg.",              categoria:"frutas",    minimarket:"Villa Este",    popular:false, dietas:["vegano","vegetariano","sin-gluten"],    stock:27 },
-  { id:105, tipo:"producto", nombre:"Jugo de Naranja 1L",         precio:1990, imagen:"/img/catalogos/jugos.webp",              descripcion:"Jugo de naranja 100% exprimido.",           categoria:"bebidas",   minimarket:"Villa Central", popular:true,  dietas:["vegano","vegetariano","sin-gluten"],    stock:30 },
-  { id:106, tipo:"producto", nombre:"Papas Fritas 140g",          precio:1490, imagen:"/img/catalogos/lays.webp",               descripcion:"Snacks de papas fritas clásicas.",          categoria:"snacks",    minimarket:"Villa Norte",   popular:false, dietas:["vegano","vegetariano","sin-gluten"],    stock:40 },
-  { id:107, tipo:"producto", nombre:"Pizza Congelada Napolitana", precio:4490, imagen:"/img/catalogos/pizza.webp",              descripcion:"Pizza congelada sabor napolitana.",         categoria:"congelados",minimarket:"Villa Sur",     popular:false, dietas:["vegetariano"],                           stock:14 },
-  { id:108, tipo:"producto", nombre:"Detergente Líquido 1L",      precio:3990, imagen:"/img/catalogos/deterge.webp",            descripcion:"Detergente líquido para ropa, 1L.",          categoria:"limpieza",  minimarket:"Villa Este",    popular:false, dietas:[],                                      stock:20 },
-  { id:109, tipo:"producto", nombre:"Pasta Dental 90g",           precio:1290, imagen:"/img/catalogos/pasta-Dental.webp",       descripcion:"Crema dental protección completa.",          categoria:"higiene",   minimarket:"Villa Central", popular:false, dietas:[],                                      stock:26 },
-  { id:110, tipo:"producto", nombre:"Alimento Perro 1kg",         precio:4990, imagen:"/img/catalogos/perroa.webp",             descripcion:"Alimento seco para perro, 1kg.",            categoria:"mascotas",  minimarket:"Villa Norte",   popular:false, dietas:[],                                      stock:16 },
+  { id:101, tipo:"producto", nombre:"Arroz Integral 1kg",         precio:1290, imagen:"/img/Catalogos/arroz-integral.webp",   descripcion:"Arroz integral grano largo, 1kg.",          categoria:"abarrotes", minimarket:"Villa Central", popular:true,  dietas:["vegano","vegetariano","sin-gluten"], stock:24 },
+  { id:102, tipo:"producto", nombre:"Leche Entera 1L",            precio:1590, imagen:"/img/Catalogos/leche.webp",             descripcion:"Leche entera pasteurizada, 1 litro.",       categoria:"lacteos",   minimarket:"Villa Norte",   popular:false, dietas:["sin-gluten"],                           stock:18 },
+  { id:103, tipo:"producto", nombre:"Pan amasado (4 un)",         precio:1290, imagen:"/img/Catalogos/pan.jpg",                descripcion:"Pan marraqueta recién horneado.",           categoria:"panaderia", minimarket:"Villa Sur",     popular:true,  dietas:["vegetariano"],                            stock:32 },
+  { id:104, tipo:"producto", nombre:"Manzanas Rojas 1kg",         precio:1490, imagen:"/img/Catalogos/manzanas.webp",          descripcion:"Manzanas rojas frescas, 1kg.",              categoria:"frutas",    minimarket:"Villa Este",    popular:false, dietas:["vegano","vegetariano","sin-gluten"],    stock:27 },
+  { id:105, tipo:"producto", nombre:"Jugo de Naranja 1L",         precio:1990, imagen:"/img/Catalogos/jugos.webp",              descripcion:"Jugo de naranja 100% exprimido.",           categoria:"bebidas",   minimarket:"Villa Central", popular:true,  dietas:["vegano","vegetariano","sin-gluten"],    stock:30 },
+  { id:106, tipo:"producto", nombre:"Papas Fritas 140g",          precio:1490, imagen:"/img/Catalogos/lays.webp",               descripcion:"Snacks de papas fritas clásicas.",          categoria:"snacks",    minimarket:"Villa Norte",   popular:false, dietas:["vegano","vegetariano","sin-gluten"],    stock:40 },
+  { id:107, tipo:"producto", nombre:"Pizza Congelada Napolitana", precio:4490, imagen:"/img/Catalogos/pizza.webp",              descripcion:"Pizza congelada sabor napolitana.",         categoria:"congelados",minimarket:"Villa Sur",     popular:false, dietas:["vegetariano"],                           stock:14 },
+  { id:108, tipo:"producto", nombre:"Detergente Líquido 1L",      precio:3990, imagen:"/img/Catalogos/deterge.webp",            descripcion:"Detergente líquido para ropa, 1L.",          categoria:"limpieza",  minimarket:"Villa Este",    popular:false, dietas:[],                                      stock:20 },
+  { id:109, tipo:"producto", nombre:"Pasta Dental 90g",           precio:1290, imagen:"/img/Catalogos/pasta-dental.webp",       descripcion:"Crema dental protección completa.",          categoria:"higiene",   minimarket:"Villa Central", popular:false, dietas:[],                                      stock:26 },
+  { id:110, tipo:"producto", nombre:"Alimento Perro 1kg",         precio:4990, imagen:"/img/Catalogos/perroa.webp",             descripcion:"Alimento seco para perro, 1kg.",            categoria:"mascotas",  minimarket:"Villa Norte",   popular:false, dietas:[],                                      stock:16 },
 ];
 
 // DATA unificada

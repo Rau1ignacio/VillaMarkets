@@ -6,7 +6,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function NavbarCliente({
   brandName = "Villa Markets",
-  brandLogo = "./src/images/Logos/Logotipo Transparente.png",
+  brandLogo = "/img/Logos/Logotipo Transparente.png",
   cartCount = 0,
 }) {
   // Obtener información del usuario actual

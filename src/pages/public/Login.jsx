@@ -118,7 +118,7 @@ export default function Login() {
         {/* Columna izquierda: tarjeta de login */}
         <section className="login-pretty-card" aria-labelledby="login-title">
           <div className="brand-mini">
-            <img src="./src/images/Logos/Logotipo Transparente.png" alt="Villa Markets" width="44" height="44" />
+              <img src="/img/Logos/Logotipo Transparente.png" alt="Villa Markets" width="44" height="44" />
             <span>Villa Markets</span>
           </div>
 
@@ -193,10 +193,10 @@ export default function Login() {
 
             <div className="cards">
               {[
-                { img: "src/images/Catalogos/Tiramisú.jpg", name: "Tiramisú", price: "$1.500" },
-                { img: "src/images/Catalogos/ensalada cesar.jpg", name: "Ensalada César", price: "$1.500" },
-                { img: "src/images/Catalogos/Lasaña de carne.jpg", name: "Lasaña de carne", price: "$5.000" },
-                { img: "src/images/Catalogos/Sopa de Tomate.jpg", name: "Sopa de Tomate", price: "$10.000" },
+                { img: "/img/Catalogos/tiramisu.jpg", name: "Tiramisú", price: "$1.500" },
+                { img: "/img/Catalogos/ensalada-cesar.jpg", name: "Ensalada César", price: "$1.500" },
+                { img: "/img/Catalogos/lasana-de-carne.jpg", name: "Lasaña de carne", price: "$5.000" },
+                { img: "/img/Catalogos/sopa-tomate.jpg", name: "Sopa de Tomate", price: "$10.000" },
               ].map((p, i) => (
                 <div className="mini-card" key={i}>
                   <img src={p.img} alt={p.name} />

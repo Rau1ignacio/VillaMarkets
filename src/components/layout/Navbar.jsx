@@ -6,7 +6,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function Navbar({
   brandName = "Villa Markets",
-  brandLogo = "./src/images/Logos/Logotipo Transparente.png",
+  brandLogo = "/img/Logos/Logotipo Transparente.png",
   cartCount = 0,
 }) {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
